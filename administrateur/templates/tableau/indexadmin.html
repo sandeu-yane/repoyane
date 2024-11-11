@@ -1,0 +1,933 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'tableau/style.css' %}">
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="grid-container">
+        <header class="header">
+            <div class="menu-icon">
+                <span class="material-icons-outlined" id="menu-icon">
+                    menu
+                </span>
+            </div>
+            <div class="header-left">
+                <span class="material-icons-outlined" id="search-icon">
+                
+                </span>
+            </div>
+            <div class="header-right">
+                <span class="material-icons-outlined" id="notifications-icon">
+                    notifications
+                </span>
+                <span class="material-icons-outlined" id="email-icon">
+                    email
+                </span>
+                <span class="material-icons-outlined" id="account-icon">
+                    account_circle
+                </span>
+            </div>
+        </header>
+
+        <aside id="sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-title">
+                    <span title="Menu" class="material-icons-outlined">
+                        menu
+                    </span>
+                    <span class="label-title">MENU</span>
+                </div>
+            </div>
+
+            <ul class="sidebar-list">
+                <li class="sidebar-list-item" data-content="eleves">
+                    <span title="Gérer les élèves" class="material-icons-outlined">
+                        people
+                    </span>
+                    <span class="label-item">Gérer les élèves</span>
+                </li>
+                <li class="sidebar-list-item" data-content="parents">
+                    <span title="Gérer les parents" class="material-icons-outlined">
+                        people
+                    </span>
+                    <span class="label-item">Gérer les parents</span>
+                </li>
+                <li class="sidebar-list-item" data-content="enseignants">
+                    <span title="Gérer les enseignants" class="material-icons-outlined">
+                        people
+                    </span>
+                    <span class="label-item">Gérer les enseignants</span>
+                </li>
+                <li class="sidebar-list-item" data-content="salles">
+                    <span title="Gérer les salles de classe" class="material-icons-outlined">
+                        meeting_room
+                    </span>
+                    <span class="label-item">Gérer les salles</span>
+                </li>
+                <li class="sidebar-list-item" data-content="notes">
+                    <span title="Gérer les notes" class="material-icons-outlined">
+                        grade
+                    </span>
+                    <span class="label-item">Gérer les notes</span>
+                </li>
+                <li class="sidebar-list-item" data-content="assiduite">
+                    <span title="Gérer l'assiduité" class="material-icons-outlined">
+                        check_circle
+                    </span>
+                    <span class="label-item">Gérer l'assiduité</span>
+                </li>
+                <li class="sidebar-list-item" data-content="statistiques">
+                    <span title="Consulter les statistiques" class="material-icons-outlined">
+                        bar_chart
+                    </span>
+                    <span class="label-item">Consulter les statistiques</span>
+                </li>
+                <li class="sidebar-list-item" data-content="deconnexion">
+                    <span title="Déconnexion" class="material-icons-outlined">
+                        logout
+                    </span>
+                    <span class="label-item">Déconnexion</span>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-container" id="main-content">
+            <div class="main-title">
+                <p class="fw-600">Dashboard</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+       document.addEventListener('DOMContentLoaded', function () {
+    const sidebarItems = document.querySelectorAll('.sidebar-list-item');
+    const mainContent = document.getElementById('main-content');
+
+    sidebarItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const content = item.getAttribute('data-content');
+            let contentHtml = '';
+
+            switch (content) {
+                case 'notes':
+                    contentHtml = `
+                        <div class="main-title">
+                            <p class="fw-600">Notes</p>
+                        </div>
+                        <p>Affichage des notes.</p>`;
+                    break;
+                case 'parents':
+                    contentHtml = `
+                        <div class="main-title">
+                            <p class="fw-600">Parents</p>
+                        </div>
+                        <!-- Formulaire pour la gestion des parents -->
+                          <div class="flex justify-between mb-4">
+    <div>
+        <button id="open-modal" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            <span class="material-icons-outlined align-middle">add_circle</span>
+            Ajouter
+        </button>
+    </div>
+    <div>
+        <input type="text" id="search" placeholder="Rechercher..." class="px-4 py-2 border rounded-md">
+    </div>
+</div>
+
+<div class="overflow-x-auto" id="table-container">
+    <table id="data-table" class="min-w-full bg-white rounded-lg shadow-md overflow-hidden">
+        <thead class="bg-gray-200 text-gray-600 text-sm leading-normal">
+            <tr>
+                <th class="py-3 px-6 text-left">ID</th>
+                <th class="py-3 px-6 text-left">Nom</th>
+                <th class="py-3 px-6 text-left">Prénoms</th>
+                <th class="py-3 px-6 text-left">Sexe</th>
+                <th class="py-3 px-6 text-left">Téléphone</th>
+                <th class="py-3 px-6 text-left">Email</th>
+                <th class="py-3 px-6 text-left">Profession</th>
+                <th class="py-3 px-6 text-left">Nombre d'enfant</th>
+                <th class="py-3 px-6 text-center">Action</th>
+            </tr>
+        </thead>
+        <tbody id="table-body" class="text-gray-600 text-sm font-light">
+           {% for parent in liste_parent %}
+            <tr>
+                <td>{{ parent.id }}</td>
+                <td>{{ parent.username }}</td>
+                <td>{{ parent.prenom }}</td>
+                <td>{{ parent.sexe }}</td>
+                <td>{{ parent.numero_tel }}</td>
+                <td>{{ parent.email }}</td>
+                <td>{{ parent.profession }}</td>
+                 <td>{{ parent.nombres_enfants }}</td>
+                <td class="text-center">
+                    <button class="text-yellow-500 hover:text-yellow-700" onclick="editParent({{ enseignant.id }})">
+                        <span class="material-icons-outlined">edit</span>
+                    </button>
+                    <button class="text-red-500 hover:text-red-700 ml-2" onclick="deleteParent({{ enseignant.id }})">
+                        <span class="material-icons-outlined">delete</span>
+                    </button>
+                </td>
+            </tr>
+              {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+                        <div id="modal-form" class="inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden z-50 absolute">
+                            <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+                                <h2 class="text-2xl font-bold mb-4">Ajouter un parent</h2>
+                                <form id="add-parent-form" method="POST" action="{% url 'addparent' %}">
+                                    {% csrf_token %}
+                                    <div class="mb-4">
+                                        <label for="input-nom" class="block text-sm font-bold mb-2">Nom:</label>
+                                        <input type="text" id="input-nom" name="noms" class="w-full px-4 py-2 border rounded-md" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="input-prenom" class="block text-sm font-bold mb-2">Prénoms:</label>
+                                        <input type="text" id="input-prenom" name="prenom" class="w-full px-4 py-2 border rounded-md" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="input-sexe" class="block text-sm font-bold mb-2">Sexe:</label>
+                                        <input type="text" id="input-sexe" name="sexe" class="w-full px-4 py-2 border rounded-md" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="input-telephone" class="block text-sm font-bold mb-2">Téléphone:</label>
+                                        <input type="text" id="input-telephone" name="telephone" class="w-full px-4 py-2 border rounded-md" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="input-email" class="block text-sm font-bold mb-2">Email:</label>
+                                        <input type="email" id="input-email" name="email" class="w-full px-4 py-2 border rounded-md" required>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="input-profession" class="block text-sm font-bold mb-2">Profession :</label>
+                                        <input type="text" id="input-profession" name="profession" class="w-full px-4 py-2 border rounded-md" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="input-" class="block text-sm font-bold mb-2">Niveau:</label>
+                                        <input type="text" id="input-nombres_enfants" name="nombres_enfants" class="w-full px-4 py-2 border rounded-md" required>
+                                    </div>
+                                    <div class="flex justify-end">
+                                        <button type="button" id="close-modal" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mr-2">Annuler</button>
+                                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Ajouter</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>`;
+                    break;
+                case 'enseignants':
+                    contentHtml = `
+                        <div class="main-title">
+                            <p class="fw-600">Enseignants</p>
+                        </div>
+                       <div class="flex justify-between mb-4">
+    <div>
+        <button id="open-modal" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            <span class="material-icons-outlined align-middle">add_circle</span>
+            Ajouter
+        </button>
+    </div>
+    <div>
+        <input type="text" id="search" placeholder="Rechercher..." class="px-4 py-2 border rounded-md">
+    </div>
+</div>
+
+<div class="overflow-x-auto" id="table-container">
+    <table id="data-table" class="min-w-full bg-white rounded-lg shadow-md overflow-hidden">
+        <thead class="bg-gray-200 text-gray-600 text-sm leading-normal">
+            <tr>
+                <th class="py-3 px-6 text-left">ID</th>
+                <th class="py-3 px-6 text-left">Nom</th>
+                <th class="py-3 px-6 text-left">Prénoms</th>
+                <th class="py-3 px-6 text-left">Sexe</th>
+                <th class="py-3 px-6 text-left">Téléphone</th>
+                <th class="py-3 px-6 text-left">Email</th>
+                <th class="py-3 px-6 text-left">Matière enseignée</th>
+                <th class="py-3 px-6 text-left">niveau</th>
+                <th class="py-3 px-6 text-left">Date d'enregistrement</th>
+                <th class="py-3 px-6 text-center">Action</th>
+            </tr>
+        </thead>
+        <tbody id="table-body" class="text-gray-600 text-sm font-light">
+           {% for enseignant in liste_enseignant %}
+            <tr>
+                <td>{{ enseignant.id }}</td>
+                <td>{{ enseignant.username }}</td>
+                <td>{{ enseignant.prenom }}</td>
+                <td>{{ enseignant.sexe }}</td>
+                <td>{{ enseignant.numero_tel }}</td>
+                <td>{{ enseignant.email }}</td>
+                <td>{{ enseignant.matiere }}</td>
+                 <td>{{ enseignant.niveau }}</td>
+                <td>{{ enseignant.date_enregistrement }}</td>
+                <td class="text-center">
+                    <button class="text-yellow-500 hover:text-yellow-700" onclick="editEnseignant({{ enseignant.id }})">
+                        <span class="material-icons-outlined">edit</span>
+                    </button>
+                    <button class="text-red-500 hover:text-red-700 ml-2" onclick="deleteEnseignant({{ enseignant.id }})">
+                        <span class="material-icons-outlined">delete</span>
+                    </button>
+                </td>
+            </tr>
+              {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+                        <div id="modal-form" class="inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden z-50 absolute">
+                            <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+                                <h2 class="text-2xl font-bold mb-4">Ajouter un(e) enseignant(e)</h2>
+                                <form id="add-enseignant-form" method="POST" action="{% url 'addenseignant' %}">
+                                    {% csrf_token %}
+                                    <div class="mb-4">
+                                        <label for="input-nom" class="block text-sm font-bold mb-2">Nom:</label>
+                                        <input type="text" id="input-nom" name="noms" class="w-full px-4 py-2 border rounded-md" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="input-prenom" class="block text-sm font-bold mb-2">Prénoms:</label>
+                                        <input type="text" id="input-prenom" name="prenom" class="w-full px-4 py-2 border rounded-md" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="input-sexe" class="block text-sm font-bold mb-2">Sexe:</label>
+                                        <input type="text" id="input-sexe" name="sexe" class="w-full px-4 py-2 border rounded-md" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="input-telephone" class="block text-sm font-bold mb-2">Téléphone:</label>
+                                        <input type="text" id="input-telephone" name="telephone" class="w-full px-4 py-2 border rounded-md" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="input-email" class="block text-sm font-bold mb-2">Email:</label>
+                                        <input type="email" id="input-email" name="email" class="w-full px-4 py-2 border rounded-md" required>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="input-matiere" class="block text-sm font-bold mb-2">Matière enseignée:</label>
+                                        <input type="text" id="input-matiere" name="matiere" class="w-full px-4 py-2 border rounded-md" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="input-niveau" class="block text-sm font-bold mb-2">Niveau:</label>
+                                        <input type="text" id="input-niveau" name="niveau" class="w-full px-4 py-2 border rounded-md" required>
+                                    </div>
+                                    <div class="flex justify-end">
+                                        <button type="button" id="close-modal" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mr-2">Annuler</button>
+                                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Ajouter</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>`;
+                    break;
+                    // code qui permet de gerer le formulaire et le tableau de la fonctionnamité de gestion des salles de classe
+                    case 'salles':
+    contentHtml = `
+        <div class="main-title">
+            <p class="fw-600">Salles</p>
+        </div>
+        <!-- Formulaire pour la gestion des salles -->
+        <div class="flex justify-between mb-4">
+            <div>
+                <button id="open-modal" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    <span class="material-icons-outlined align-middle">add_circle</span>
+                    Ajouter
+                </button>
+            </div>
+            <div>
+                <input type="text" id="search" placeholder="Rechercher..." class="px-4 py-2 border rounded-md">
+            </div>
+        </div>
+
+        <div class="overflow-x-auto" id="table-container" >
+            <table id="data-table" class="min-w-full bg-white rounded-lg shadow-md overflow-hidden">
+                <thead class="bg-gray-200 text-gray-600 text-sm leading-normal">
+                    <tr>
+                        <th class="py-3 px-6 text-left">ID</th>
+                        <th class="py-3 px-6 text-left">Nom</th>
+                        <th class="py-3 px-6 text-left">Localisation</th>
+                        <th class="py-3 px-6 text-left">Effectifs</th>
+                        <th class="py-3 px-6 text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body" class="text-gray-600 text-sm font-light">
+                   {% for salle in liste_salle %}
+                    <tr>
+                        <td>{{ salle.id }}</td>
+                        <td>{{ salle.nom }}</td>
+                        <td>{{ salle.localisation }}</td>
+                        <td>{{ salle.effectifs }}</td>
+                        <td class="text-center">
+                            <button class="text-yellow-500 hover:text-yellow-700" onclick="editSalle({{ salle.id }})">
+                                <span class="material-icons-outlined">edit</span>
+                            </button>
+                            <button class="text-red-500 hover:text-red-700 ml-2" onclick="deleteSalle({{ salle.id }})">
+                                <span class="material-icons-outlined">delete</span>
+                            </button>
+                        </td>
+                    </tr>
+                   {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div id="modal-form" class="inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden z-50 absolute">
+            <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+                <h2 class="text-2xl font-bold mb-4">Ajouter une salle</h2>
+                <form id="add-salle-form" method="POST" action="{% url 'addsalle' %}">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label for="input-nom" class="block text-sm font-bold mb-2">Nom:</label>
+                        <input type="text" id="input-nom" name="nom" class="w-full px-4 py-2 border rounded-md" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="input-localisation" class="block text-sm font-bold mb-2">Localisation:</label>
+                        <input type="text" id="input-localisation" name="localisation" class="w-full px-4 py-2 border rounded-md" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="input-effectifs" class="block text-sm font-bold mb-2">Effectifs:</label>
+                        <input type="text" id="input-effectifs" name="effectifs" class="w-full px-4 py-2 border rounded-md" >
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="button" id="close-modal" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mr-2">Annuler</button>
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Ajouter</button>
+                    </div>
+                </form>
+            </div>
+        </div>`;
+    break;
+    // code qui permet de gerer le formulaire et le tableau de la fonctionnamité de gestion des eleves
+    case 'eleves':
+    contentHtml = `
+        <div class="main-title">
+            <p class="fw-600">eleves</p>
+        </div>
+        <!-- Formulaire pour la gestion des eleves -->
+        <div class="flex justify-between mb-4">
+            <div>
+                <button id="open-modal" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    <span class="material-icons-outlined align-middle">add_circle</span>
+                    Ajouter
+                </button>
+            </div>
+            <div>
+                <input type="text" id="search" placeholder="Rechercher..." class="px-4 py-2 border rounded-md">
+            </div>
+        </div>
+    <div class="overflow-x-auto" id="table-container">    
+    <table id="data-table" class="min-w-full bg-white rounded-lg shadow-md overflow-hidden">
+        <thead class="bg-gray-200 text-gray-600 text-sm leading-normal">
+            <tr>
+                <th class="py-3 px-6 text-left">ID</th>
+                <th class="py-3 px-6 text-left">Nom</th>
+                <th class="py-3 px-6 text-left">Prénoms</th>
+                <th class="py-3 px-6 text-left">Date de Naissance</th>
+                <th class="py-3 px-6 text-left">Sexe</th>
+                <th class="py-3 px-6 text-left">Quartier</th>
+                <th class="py-3 px-6 text-left">Classe</th>
+                <th class="py-3 px-6 text-left">Téléphone Parent</th>
+                <th class="py-3 px-6 text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody id="table-body" class="text-gray-600 text-sm font-light">
+            {% for eleve in liste_eleve %}
+            <tr class="border-b border-gray-200 hover:bg-gray-100">
+                <td class="py-3 px-6 text-left whitespace-nowrap">{{ eleve.id }}</td>
+                <td class="py-3 px-6 text-left">{{ eleve.noms }}</td>
+                <td class="py-3 px-6 text-left">{{ eleve.prenoms }}</td>
+                <td class="py-3 px-6 text-left">{{ eleve.date_naissance }}</td>
+                <td class="py-3 px-6 text-left">{{ eleve.sexe }}</td>
+                <td class="py-3 px-6 text-left">{{ eleve.quartier }}</td>
+                <td class="py-3 px-6 text-left">{{ eleve.classe }}</td>
+                <td class="py-3 px-6 text-left">{{ eleve.tel_parent }}</td>
+                <td class="py-3 px-6 text-center">
+                    <button class="text-yellow-500 hover:text-yellow-700" onclick="editEleve({{ eleve.id }})">
+                        <span class="material-icons-outlined">edit</span>
+                    </button>
+                    <button class="text-red-500 hover:text-red-700 ml-2" onclick="deleteEleve({{ eleve.id }})">
+                        <span class="material-icons-outlined">delete</span>
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+        <div id="modal-form" class="inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden z-50 absolute">
+            <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+                <h2 class="text-2xl font-bold mb-4">Ajouter les eleves</h2>
+                <form id="add-eleve-form" method="POST" action="{% url 'addeleve' %}">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label for="input-noms" class="block text-sm font-bold mb-2">NOMS:</label>
+                        <input type="text" id="input-noms" name="noms" class="w-full px-4 py-2 border rounded-md" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="input-prenoms" class="block text-sm font-bold mb-2">PRENOMS:</label>
+                        <input type="text" id="input-prenoms" name="prenoms" class="w-full px-4 py-2 border rounded-md" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="input-sexe" class="block text-sm font-bold mb-2">SEXE:</label>
+                        <input type="text" id="input-sexe" name="sexe" class="w-full px-4 py-2 border rounded-md" required >
+                    </div>
+                     <div class="mb-4">
+                        <label for="input-naissance" class="block text-sm font-bold mb-2">DATE DE NAISSANCE:</label>
+                        <input type="date" id="input-naissance" name="date_naissance" class="w-full px-4 py-2 border rounded-md" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="input-quartier" class="block text-sm font-bold mb-2">QUARTIER:</label>
+                        <input type="text" id="input-quartier" name="quartier" class="w-full px-4 py-2 border rounded-md" >
+                    </div>
+                     <div class="mb-4">
+                        <label for="input-classe" class="block text-sm font-bold mb-2">CLASSE:</label>
+                        <input type="text" id="input-classe" name="classe" class="w-full px-4 py-2 border rounded-md" required>
+                    </div>
+                     <div class="mb-4">
+                        <label for="input-tel_parent" class="block text-sm font-bold mb-2">NUMERO PARENT:</label>
+                        <input type="text" id="input-tel_parent" name="tel_parent" class="w-full px-4 py-2 border rounded-md" required>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="button" id="close-modal" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mr-2">Annuler</button>
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Ajouter</button>
+                    </div>
+                </form>
+            </div>
+        </div>`;
+    break;
+
+                case 'deconnexion':
+                    contentHtml = `
+                        <div class="main-title">
+                            <p class="fw-600">Déconnexion</p>
+                        </div>
+                        <form method="post" action="{% url 'deconnexion' %}" id="logout-form">
+                            {% csrf_token %}
+                            <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                Déconnexion
+                            </button>
+                        </form>`;
+                    break;
+                
+
+  }
+
+            mainContent.innerHTML = contentHtml;
+
+            // Gestion de l'ouverture du modal
+            const openModalBtn = document.getElementById('open-modal');
+            const modal = document.getElementById('modal-form');
+            const closeModalBtn = document.getElementById('close-modal');
+
+            if (openModalBtn) {
+                openModalBtn.addEventListener('click', () => {
+                    modal.classList.remove('hidden');
+                });
+            }
+
+            if (closeModalBtn) {
+                closeModalBtn.addEventListener('click', () => {
+                    modal.classList.add('hidden');
+                });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+
+    // 1. Gestion de l'ajout d'un élève
+    // ----------------------------------
+    const addEleveForm = document.getElementById('add-eleve-form');
+    const modalForm = document.getElementById('modal-form');
+    const openModalBtn = document.getElementById('open-modal');
+    const closeModalBtn = document.getElementById('close-modal');
+    const tableContainer = document.getElementById('table-container'); // Tableau des élèves
+
+    // Ouvrir le modal pour ajouter un élève
+    if (openModalBtn) {
+        openModalBtn.addEventListener('click', () => {
+            modalForm.classList.remove('hidden');
+            tableContainer.classList.add('hidden'); // Masquer le tableau
+        });
+    }
+
+    // Fermer le modal et afficher le tableau des élèves
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', () => {
+            modalForm.classList.add('hidden');
+            tableContainer.classList.remove('hidden'); // Afficher le tableau
+        });
+    }
+
+    // Soumission du formulaire pour ajouter un élève
+    if (addEleveForm) {
+        addEleveForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            fetch(addEleveForm.action, {
+                method: 'POST',
+                body: new FormData(addEleveForm),
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Ajouter l'élève dans le tableau après soumission
+                    const eleve = data.eleve;
+                    const newRow = `
+                        <tr>
+                            <td>${eleve.id}</td>
+                            <td>${eleve.noms}</td>
+                            <td>${eleve.prenoms}</td>
+                            <td>${eleve.date_naissance}</td>
+                            <td>${eleve.sexe}</td>
+                            <td>${eleve.quartier}</td>
+                            <td>${eleve.classe}</td>
+                            <td>${eleve.tel_parent}</td>
+                            <td>
+                                <button class="edit-btn" data-id="${eleve.id}">Modifier</button>
+                                <button class="delete-btn" data-id="${eleve.id}">Supprimer</button>
+                            </td>
+                        </tr>
+                    `;
+                    document.querySelector('table tbody').insertAdjacentHTML('beforeend', newRow);
+                    // Réinitialiser le formulaire, fermer le modal et afficher le tableau
+                    addEleveForm.reset();
+                    modalForm.classList.add('hidden');
+                    tableContainer.classList.remove('hidden');
+                } else {
+                    alert('Erreur lors de l\'ajout de l\'élève.');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Une erreur s\'est produite lors de l\'ajout de l\'élève.');
+            });
+        });
+    }
+
+    // 2. Gestion de l'ajout d'un enseignant
+    // --------------------------------------
+    const addEnseignantForm = document.getElementById('add-enseignant-form');
+    if (addEnseignantForm) {
+        addEnseignantForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            fetch(addEnseignantForm.action, {
+                method: 'POST',
+                body: new FormData(addEnseignantForm),
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Code pour ajouter l'enseignant dans le tableau
+                    const enseignant = data.enseignant;
+                    const newRow = `
+                        <tr>
+                            <td>${enseignant.id}</td>
+                            <td>${enseignant.noms}</td>
+                            <td>${enseignant.prenom}</td>
+                            <td>${enseignant.matiere}</td>
+                            <td>${enseignant.niveau}</td>
+                            <td>
+                                <button class="edit-enseignant-btn" data-id="${enseignant.id}">Modifier</button>
+                                <button class="delete-enseignant-btn" data-id="${enseignant.id}">Supprimer</button>
+                            </td>
+                        </tr>
+                    `;
+                    document.querySelector('table tbody').insertAdjacentHTML('beforeend', newRow);
+                } else {
+                    alert('Erreur lors de l\'ajout de l\'enseignant.');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Une erreur s\'est produite lors de l\'ajout de l\'enseignant.');
+            });
+        });
+    }
+
+     // 3. Gestion de l'ajout d'un PARENT
+    // --------------------------------------
+    const addParentForm = document.getElementById('add-parent-form');
+    if (addParentForm) {
+        addParentForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            fetch(addParentForm.action, {
+                method: 'POST',
+                body: new FormData(addParentForm),
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Code pour ajouter le parent dans le tableau
+                    const parent = data.parent;
+                    const newRow = `
+                        <tr>
+                            <td>${parent.id}</td>
+                            <td>${parent.noms}</td>
+                            <td>${parent.prenom}</td>
+                            <td>${parent.profession}</td>
+                            <td>${parent.nombres_enfants}</td>
+                            <td>
+                                <button class="edit-parent-btn" data-id="${parent.id}">Modifier</button>
+                                <button class="delete-parent-btn" data-id="${parent.id}">Supprimer</button>
+                            </td>
+                        </tr>
+                    `;
+                    document.querySelector('table tbody').insertAdjacentHTML('beforeend', newRow);
+                } else {
+                    alert('Erreur lors de l\'ajout du parent.');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Une erreur s\'est produite lors de l\'ajout du parent.');
+            });
+        });
+    }
+
+    // 4. Gestion de la déconnexion
+    // -----------------------------
+    const logoutForm = document.getElementById('logout-form');
+    if (logoutForm) {
+        logoutForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            fetch(logoutForm.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = "{% url 'connexion' %}"; // Redirection après déconnexion
+                }
+            });
+        });
+    }
+
+    // 5. Gestion de la modification d'un enseignant
+    // ---------------------------------------------
+    function editEnseignant(id) {
+        fetch(`/get_enseignant/${id}/`)
+            .then(response => response.json())
+            .then(data => {
+                const modal = document.getElementById('modal-form');
+                modal.classList.remove('hidden'); // Afficher le modal
+
+                // Remplir le formulaire avec les données de l'enseignant
+                document.getElementById('input-nom').value = data.noms;
+                document.getElementById('input-prenom').value = data.prenom;
+                document.getElementById('input-sexe').value = data.sexe;
+                document.getElementById('input-telephone').value = data.telephone;
+                document.getElementById('input-email').value = data.email;
+                document.getElementById('input-matiere').value = data.matiere;
+                document.getElementById('input-niveau').value = data.niveau;
+
+                // Adapter le formulaire pour l'édition
+                const form = document.getElementById('add-enseignant-form');
+                form.action = `/modifier_enseignant/${id}/`;
+                form.querySelector('button[type="submit"]').textContent = "Modifier";
+            });
+    } 
+
+    // 5. Gestion de la suppression d'un enseignant
+    // --------------------------------------------
+    function deleteEnseignant(id) {
+        if (confirm('Êtes-vous sûr de vouloir supprimer cet enseignant ?')) {
+            fetch(`/supprimer_enseignant/${id}/`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload(); // Recharger la page après suppression
+                } else {
+                    alert('Erreur lors de la suppression.');
+                }
+            });
+        }
+    }
+
+    // 6. Gestion des événements pour les boutons "Modifier" et "Supprimer"
+    // --------------------------------------------------------------------
+    document.querySelectorAll('.edit-enseignant-btn').forEach(button => {
+        const id = button.getAttribute('data-id');
+        button.addEventListener('click', () => editEnseignant(id));
+    });
+
+    document.querySelectorAll('.delete-enseignant-btn').forEach(button => {
+        const id = button.getAttribute('data-id');
+        button.addEventListener('click', () => deleteEnseignant(id));
+    });
+});  
+              
+// Initialisation de DataTables pour le tableau (si nécessaire)
+const dataTable = document.getElementById('data-table');
+if (dataTable) {
+    $(dataTable).DataTable();
+}
+
+// 7. Gestion de l'ajout d'un enseignant
+    // --------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+    // Ouvrir le modal
+    const openModalButton = document.getElementById('open-modal');
+    const modalForm = document.getElementById('modal-form');
+    const closeModalButton = document.getElementById('close-modal');
+
+    openModalButton.addEventListener('click', () => {
+        modalForm.classList.remove('hidden');
+    });
+
+    // Fermer le modal
+    closeModalButton.addEventListener('click', () => {
+        modalForm.classList.add('hidden');
+    });
+
+    // Gestion de l'ajout d'une salle
+    const addSalleForm = document.getElementById('add-salle-form');
+    
+    if (addSalleForm) {
+        addSalleForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            
+            // Envoi de la requête POST pour ajouter une salle
+            fetch(addSalleForm.action, {
+                method: 'POST',
+                body: new FormData(addSalleForm),
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Ajouter la nouvelle salle dans le tableau
+                    const salle = data.salle;
+                    const newRow = `
+                        <tr>
+                            <td>${salle.id}</td>
+                            <td>${salle.nom}</td>
+                            <td>${salle.localisation}</td>
+                            <td>${salle.effectifs}</td>
+                            <td class="text-center">
+                                <button class="text-yellow-500 hover:text-yellow-700" onclick="editSalle(${salle.id})">
+                                    <span class="material-icons-outlined">edit</span>
+                                </button>
+                                <button class="text-red-500 hover:text-red-700 ml-2" onclick="deleteSalle(${salle.id})">
+                                    <span class="material-icons-outlined">delete</span>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    document.querySelector('#table-body').insertAdjacentHTML('beforeend', newRow);
+
+                    // Fermer le modal après l'ajout
+                    modalForm.classList.add('hidden');
+                } else {
+                    alert('Erreur lors de l\'ajout de la salle.');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Une erreur s\'est produite lors de l\'ajout de la salle.');
+            });
+        });
+    }
+});
+
+
+ // Soumission du formulaire pour ajouter un élève
+ if (addEleveForm) {
+        addEleveForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            fetch(addEleveForm.action, {
+                method: 'POST',
+                body: new FormData(addEleveForm),
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Ajouter l'élève dans le tableau après soumission
+                    const eleve = data.eleve;
+                    const newRow = `
+                        <tr>
+                            <td>${eleve.id}</td>
+                            <td>${eleve.noms}</td>
+                            <td>${eleve.prenoms}</td>
+                            <td>${eleve.date_naissance}</td>
+                            <td>${eleve.sexe}</td>
+                            <td>${eleve.quartier}</td>
+                            <td>${eleve.classe}</td>
+                            <td>${eleve.tel_parent}</td>
+                            <td>
+                                <button class="edit-btn" data-id="${eleve.id}">Modifier</button>
+                                <button class="delete-btn" data-id="${eleve.id}">Supprimer</button>
+                            </td>
+                        </tr>
+                    `;
+                    document.querySelector('table tbody').insertAdjacentHTML('beforeend', newRow);
+                    // Réinitialiser le formulaire, fermer le modal et afficher le tableau
+                    addEleveForm.reset();
+                    modalForm.classList.add('hidden');
+                    tableContainer.classList.remove('hidden');
+                } else {
+                    alert('Erreur lors de l\'ajout de l\'élève.');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Une erreur s\'est produite lors de l\'ajout de l\'élève.');
+            });
+        });
+    }
+
+   
+// Fonction pour la recherche d'élèves dans le tableau
+
+
+});
+    });
+});
+
+
+
+
+
+
+ 
+
+
+
+
+
+    </script>
+     
+</body>
+
+</html>

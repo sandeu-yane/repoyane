@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'tableau/style.css' %}">
+</head>
+<body>
+
+    <div class="grid-container">
+        <header class="header">
+            <div class="menu-icon">
+                <span class="material-icons-outlined" id="menu-icon">
+                    menu
+                </span>
+            </div>
+            <div class="header-left">
+                <span class="material-icons-outlined" id="search-icon">
+                    search
+                </span>
+            </div>
+            <div class="header-right ">
+                <span class="material-icons-outlined" id="notifications-icon">
+                    notifications
+                </span>
+                <span class="material-icons-outlined" id="email-icon">
+                    email
+                </span>
+                <span class="material-icons-outlined" id="account-icon">
+                    account_circle
+                </span>
+            </div>
+        </header>
+
+        <aside id="sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-title">
+                    <span title="CTM" class="material-icons-outlined">
+                        menu
+                    </span>
+                    <span class="label-title">menu</span>
+                </div>
+            </div>
+            
+            <ul class="sidebar-list">
+                <li class="sidebar-list-item" data-content="notes">
+                    <span title="notes" class="material-icons-outlined">
+                        grade
+                    </span>
+                    <span class="label-item">Gerer les notes</span>
+                </li>
+                <li class="sidebar-list-item" data-content="matieres">
+                    <span title="Gestion matieres" class="material-icons-outlined">
+                        subject
+                    </span>
+                    <span class="label-item">Gerer les Matieres</span>
+                </li>
+                <li class="sidebar-list-item" data-content="presences">
+                    <span title="Gestion d'assiduité" class="material-icons-outlined">
+                        check_circle
+                    </span>
+                   <span class="label-item">Gerer l'assiduité</span>
+                </li>
+                <li class="sidebar-list-item" data-content="deconnexion">
+                    <span title="deconnexion" class="material-icons-outlined">
+                        deconnexion
+                    </span>
+                    <span class="label-item">Deconnexion</span>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-container" id="main-content">
+            <div class="main-title">
+                <p class="fw-600">Dashboard</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const sidebarItems = document.querySelectorAll('.sidebar-list-item');
+        const mainContent = document.getElementById('main-content');
+
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const content = item.getAttribute('data-content');
+                
+                let contentHtml = '';
+
+                if (content === 'notes') {
+                    contentHtml = `
+                        <div class="main-title">
+                            <p class="fw-600">Notes</p>
+                        </div>
+                        <p>Gestion des notes.</p>`;
+                } else if (content === 'matieres') {
+                    contentHtml = `
+                        <div class="main-title">
+                            <p class="fw-600">matieres</p>
+                        </div>
+                       `;
+                } else if (content === 'presences') {
+                    contentHtml = `
+                        <div class="main-title">
+                            <p class="fw-600">presence</p>
+                        </div>
+                        <p>gestion des presences.</p>`;
+                }
+// code pour la deconnexion 
+                else if (content === 'deconnexion') {
+                    contentHtml = `
+                        <div class="main-title">
+                            <p class="fw-600">Deconnexion</p>
+                        </div>
+                         <form method="post" action="{% url 'deconnexion' %}" id="logout-form">
+                            {% csrf_token %}
+                            <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                Déconnexion
+                            </button>
+                        </form>`;
+                }
+
+                mainContent.innerHTML = contentHtml;
+            });
+        });
+    </script>
+</body>
+</html>

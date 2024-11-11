@@ -1,0 +1,116 @@
+/* Code CSS modifié */
+:root {
+    --cyan: hsl(206, 100%, 88%);
+    --text-cyan: hsl(206, 100%, 88%, 0.75);
+    --greenly: hsl(140, 49%, 67%);
+    --darkly: hsl(220, 12%, 5%);
+    --text-primary: hsl(220, 8%, 16%);
+    --lightly: hsl(206, 20%, 93%);
+    --light-red: hsl(10, 200%, 10%); /* Couleur rouge légère */
+    --sky-blue: hsl(200, 100%, 50%);  /* Couleur bleu ciel */
+}
+
+body {
+    background: var(--lightly);
+}
+
+.material-icons-outlined {
+    vertical-align: middle;
+    line-height: 1px;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: 260px 1fr 1fr 1fr;
+    grid-template-rows: 0.2fr 3fr;
+    grid-template-areas: 'sidebar header header header' 'sidebar main main main';
+    height: 100vh;
+}
+
+/* ========header======== */
+.header {
+    grid-area: header;
+    box-shadow: 0 8px 12px -4px rgba(0, 0, 0, 0.2);
+    height: 70px;
+    background-color: var(--sky-blue); /* Couleur bleu ciel */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+}
+
+.menu-icon {
+    display: none;
+}
+
+/* ======sidebar======== */
+#sidebar {
+    grid-area: sidebar;
+    background-color: var(--light-red); /* Couleur rouge légère */
+    color: var(--text-cyan);
+    height: 100%;
+    overflow-y: auto;
+    transition: all 0.3s ease-in;
+}
+
+.sidebar-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    margin-bottom: 32px;
+    color: var(--lightly);
+}
+
+.sidebar-brand {
+    font-size: 20px;
+    font-weight: 300;
+}
+
+.sidebar-list {
+    padding: 0;
+    margin-top: 16px;
+    list-style-type: none;
+}
+
+.sidebar-list-item {
+    padding: 20px;
+    transition: 0.3s ease-in;
+}
+
+.sidebar-list-item:hover {
+    padding: 40px;
+    transition: 0.3s ease-in;
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* =======main======= */
+.main-container {
+    grid-area: main;
+}
+
+.fw-600 {
+    font-weight: 600;
+}
+
+/* ========responsive========= */
+/* *md mw <= 993px */
+@media screen and (max-width: 992px) {
+    .grid-container {
+        grid-template-columns: 120px 1fr;
+        grid-template-areas: 'sidebar header' 'sidebar main';
+    }
+
+    .sidebar-title {
+        justify-content: center;
+    }
+
+    .sidebar-title > span {
+        display: inline;
+    }
+
+    .sidebar-brand > .label-title {
+        display: none;
+    }
+}

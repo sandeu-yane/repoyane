@@ -1,0 +1,8 @@
+/* static/css/styles.css */
+.background-image {
+    background-image: url('images/bg1.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+}
