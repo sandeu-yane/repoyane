@@ -77,6 +77,12 @@
                     </span>
                     <span class="label-item">Gérer les salles</span>
                 </li>
+                <li class="sidebar-list-item" data-content="matieres">
+                    <span title="Gestion matieres" class="material-icons-outlined">
+                        subject
+                    </span>
+                    <span class="label-item">Gerer les Matieres</span>
+                </li>
                 <li class="sidebar-list-item" data-content="notes">
                     <span title="Gérer les notes" class="material-icons-outlined">
                         grade
@@ -408,6 +414,82 @@
             </div>
         </div>`;
     break;
+    // code qui permet de gerer les matieres
+    case 'matieres':
+    contentHtml = `
+        <div class="main-title">
+            <p class="fw-600">matiere </p>
+        </div>
+         <!-- Formulaire pour la gestion des salles -->
+        <div class="flex justify-between mb-4">
+            <div>
+                <button id="open-modal" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    <span class="material-icons-outlined align-middle">add_circle</span>
+                    Ajouter
+                </button>
+            </div>
+            <div>
+                <input type="text" id="search" placeholder="Rechercher..." class="px-4 py-2 border rounded-md">
+            </div>
+        </div>
+
+        <div class="overflow-x-auto" id="table-container" >
+            <table id="data-table" class="min-w-full bg-white rounded-lg shadow-md overflow-hidden">
+                <thead class="bg-gray-200 text-gray-600 text-sm leading-normal">
+                    <tr>
+                        <th class="py-3 px-6 text-left">ID</th>
+                        <th class="py-3 px-6 text-left">Nom</th>
+                        <th class="py-3 px-6 text-left">COEFFICIENT</th>
+                        <th class="py-3 px-6 text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body" class="text-gray-600 text-sm font-light">
+                   {% for Matiere in liste_matiere %}
+                    <tr>
+                        <td>{{ matiere.id }}</td>
+                        <td>{{ matiere.nom }}</td>
+                        <td>{{ matiere.coefficient }}</td>
+                        <td class="text-center">
+                            <button class="text-yellow-500 hover:text-yellow-700" onclick="editMatiere({{ matiere.id }})">
+                                <span class="material-icons-outlined">edit</span>
+                            </button>
+                            <button class="text-red-500 hover:text-red-700 ml-2" onclick="deleteMatiere({{ matiere.id }})">
+                                <span class="material-icons-outlined">delete</span>
+                            </button>
+                        </td>
+                    </tr>
+                   {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div id="modal-form" class="inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden z-50 absolute">
+            <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+                <h2 class="text-2xl font-bold mb-4">Ajouter une matiere </h2>
+                <form id="add-matiere-form" method="POST" action="{% url 'addmatiere' %}">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label for="input-nom" class="block text-sm font-bold mb-2">Nom:</label>
+                        <input type="text" id="input-nom" name="nom" class="w-full px-4 py-2 border rounded-md" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="input-coefficient" class="block text-sm font-bold mb-2">COEFFICIENT:</label>
+                         <select id="coefficient" name="coefficient" class="mt-1 block w-md pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    {% for coefficient in coefficients %}
+                    <option value="{{ coefficient.id }}">{{ coefficient.nom }}</option>
+                    {% endfor %}
+                </select>
+                        <!-- input type="text" id="input-coefficient" name="coefficient" class="w-full px-4 py-2 border rounded-md" required -->
+                    </div>
+                   
+                    <div class="flex justify-end">
+                        <button type="button" id="close-modal" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mr-2">Annuler</button>
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Ajouter</button>
+                    </div>
+                </form>
+            </div>
+        </div>`;
+        break;
     // code qui permet de gerer le formulaire et le tableau de la fonctionnamité de gestion des eleves
     case 'eleves':
     contentHtml = `
@@ -450,7 +532,7 @@
                 <td class="py-3 px-6 text-left">{{ eleve.date_naissance }}</td>
                 <td class="py-3 px-6 text-left">{{ eleve.sexe }}</td>
                 <td class="py-3 px-6 text-left">{{ eleve.quartier }}</td>
-                <td class="py-3 px-6 text-left">{{ eleve.classe }}</td>
+                <td class="py-3 px-6 text-left">{{ eleve.salle.nom }}</td>
                 <td class="py-3 px-6 text-left">{{ eleve.tel_parent }}</td>
                 <td class="py-3 px-6 text-center">
                     <button class="text-yellow-500 hover:text-yellow-700" onclick="editEleve({{ eleve.id }})">
@@ -493,10 +575,20 @@
                         <input type="text" id="input-quartier" name="quartier" class="w-full px-4 py-2 border rounded-md" >
                     </div>
                      <div class="mb-4">
+                    
+
+                    <div class="mb-4">
                         <label for="input-classe" class="block text-sm font-bold mb-2">CLASSE:</label>
-                        <input type="text" id="input-classe" name="classe" class="w-full px-4 py-2 border rounded-md" required>
+                         <select id="classe" name="classe" class="mt-1 block w-md pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    {% for salle in salles %}
+                    <option value="{{ salle.id }}">{{ salle.nom }}</option>
+                    {% endfor %}
+                </select>
+                        <!-- input type="text" id="input-classe" name="classe" class="w-full px-4 py-2 border rounded-md" required -->
                     </div>
-                     <div class="mb-4">
+
+
+
                         <label for="input-tel_parent" class="block text-sm font-bold mb-2">NUMERO PARENT:</label>
                         <input type="text" id="input-tel_parent" name="tel_parent" class="w-full px-4 py-2 border rounded-md" required>
                     </div>
@@ -856,6 +948,57 @@ if (dataTable) {
             });
         });
     }
+
+// code pour ajouter une matiere 
+const addMatiereForm = document.getElementById('add-matiere-form');
+    
+    if (addMatiereForm) {
+        addMatiereForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            
+            // Envoi de la requête POST pour ajouter une salle
+            fetch(addMatiereForm.action, {
+                method: 'POST',
+                body: new FormData(addMatiereForm),
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Ajouter la nouvelle matiere dans le tableau
+                    const matiere = data.matiere;
+                    const newRow = `
+                        <tr>
+                            <td>${matiere.id}</td>
+                            <td>${matiere.nom}</td>
+                            <td>${matiere.coefficient}</td>
+                            <td class="text-center">
+                                <button class="text-yellow-500 hover:text-yellow-700" onclick="editMatiere(${matiere.id})">
+                                    <span class="material-icons-outlined">edit</span>
+                                </button>
+                                <button class="text-red-500 hover:text-red-700 ml-2" onclick="deleteMatiere(${matiere.id})">
+                                    <span class="material-icons-outlined">delete</span>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    document.querySelector('#table-body').insertAdjacentHTML('beforeend', newRow);
+
+                    // Fermer le modal après l'ajout
+                    modalForm.classList.add('hidden');
+                } else {
+                    alert('Erreur lors de l\'ajout de la matiere.');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Une erreur s\'est produite lors de l\'ajout de la matiere.');
+            });
+        });
+    } 
+
 });
 
 
@@ -909,6 +1052,21 @@ if (dataTable) {
 
    
 // Fonction pour la recherche d'élèves dans le tableau
+// ✅ Fonction de filtrage des élèves
+document.getElementById("search").addEventListener("input", function () {
+    let searchValue = this.value.toLowerCase();
+    let tableRows = document.querySelectorAll("#table-container tbody tr");
+
+    tableRows.forEach(row => {
+        let rowText = row.innerText.toLowerCase();
+        if (rowText.includes(searchValue)) {
+            row.style.display = ""; // Afficher la ligne si elle correspond à la recherche
+        } else {
+            row.style.display = "none"; // Masquer sinon
+        }
+    });
+});
+
 
 
 });

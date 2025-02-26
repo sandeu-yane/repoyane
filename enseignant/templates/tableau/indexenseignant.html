@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,67 +10,47 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{% static 'tableau/style.css' %}">
 </head>
-<body>
 
+<body>
     <div class="grid-container">
         <header class="header">
             <div class="menu-icon">
-                <span class="material-icons-outlined" id="menu-icon">
-                    menu
-                </span>
+                <span class="material-icons-outlined" id="menu-icon">menu</span>
             </div>
             <div class="header-left">
-                <span class="material-icons-outlined" id="search-icon">
-                    search
-                </span>
+                <span class="material-icons-outlined" id="search-icon">search</span>
             </div>
-            <div class="header-right ">
-                <span class="material-icons-outlined" id="notifications-icon">
-                    notifications
-                </span>
-                <span class="material-icons-outlined" id="email-icon">
-                    email
-                </span>
-                <span class="material-icons-outlined" id="account-icon">
-                    account_circle
-                </span>
+            <div class="header-right">
+                <span class="material-icons-outlined" id="notifications-icon">notifications</span>
+                <span class="material-icons-outlined" id="email-icon">email</span>
+                <span class="material-icons-outlined" id="account-icon">account_circle</span>
             </div>
         </header>
 
         <aside id="sidebar">
             <div class="sidebar-brand">
                 <div class="sidebar-title">
-                    <span title="CTM" class="material-icons-outlined">
-                        menu
-                    </span>
+                    <span title="CTM" class="material-icons-outlined">menu</span>
                     <span class="label-title">menu</span>
                 </div>
             </div>
-            
+
             <ul class="sidebar-list">
                 <li class="sidebar-list-item" data-content="notes">
-                    <span title="notes" class="material-icons-outlined">
-                        grade
-                    </span>
-                    <span class="label-item">Gerer les notes</span>
+                    <span title="notes" class="material-icons-outlined">grade</span>
+                    <span class="label-item">Gérer les notes</span>
                 </li>
                 <li class="sidebar-list-item" data-content="matieres">
-                    <span title="Gestion matieres" class="material-icons-outlined">
-                        subject
-                    </span>
-                    <span class="label-item">Gerer les Matieres</span>
+                    <span title="Gestion matieres" class="material-icons-outlined">subject</span>
+                    <span class="label-item">Gérer les Matières</span>
                 </li>
                 <li class="sidebar-list-item" data-content="presences">
-                    <span title="Gestion d'assiduité" class="material-icons-outlined">
-                        check_circle
-                    </span>
-                   <span class="label-item">Gerer l'assiduité</span>
+                    <span title="Gestion d'assiduité" class="material-icons-outlined">check_circle</span>
+                    <span class="label-item">Gérer l'assiduité</span>
                 </li>
                 <li class="sidebar-list-item" data-content="deconnexion">
-                    <span title="deconnexion" class="material-icons-outlined">
-                        deconnexion
-                    </span>
-                    <span class="label-item">Deconnexion</span>
+                    <span title="deconnexion" class="material-icons-outlined">logout</span>
+                    <span class="label-item">Déconnexion</span>
                 </li>
             </ul>
         </aside>
@@ -88,45 +69,363 @@
         sidebarItems.forEach(item => {
             item.addEventListener('click', () => {
                 const content = item.getAttribute('data-content');
-                
                 let contentHtml = '';
 
-                if (content === 'notes') {
-                    contentHtml = `
-                        <div class="main-title">
-                            <p class="fw-600">Notes</p>
-                        </div>
-                        <p>Gestion des notes.</p>`;
-                } else if (content === 'matieres') {
-                    contentHtml = `
-                        <div class="main-title">
-                            <p class="fw-600">matieres</p>
-                        </div>
-                       `;
-                } else if (content === 'presences') {
-                    contentHtml = `
-                        <div class="main-title">
-                            <p class="fw-600">presence</p>
-                        </div>
-                        <p>gestion des presences.</p>`;
-                }
-// code pour la deconnexion 
-                else if (content === 'deconnexion') {
-                    contentHtml = `
-                        <div class="main-title">
-                            <p class="fw-600">Deconnexion</p>
-                        </div>
-                         <form method="post" action="{% url 'deconnexion' %}" id="logout-form">
-                            {% csrf_token %}
-                            <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                Déconnexion
-                            </button>
-                        </form>`;
+                switch (content) {
+                    case 'notes':
+                        contentHtml = `
+                            <div class="main-title">
+                                <p class="fw-600">Notes</p>
+                            </div>
+                            <p>Gestion des notes.</p>
+                             <form id="assiduite-form" method="post" action="{% url 'gestion_notes' %}">
+                                <div class="mb-4">
+                                    <label for="matiere" class="block text-sm font-medium text-gray-700">Matière</label>
+                                    <select id="matiere" name="matiere" class="mt-1 block w-md pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                        {% for matiere in matieres %}
+                                        <option value="{{ matiere.id }}">{{ matiere.nom }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="salle" class="block text-sm font-medium text-gray-700">Salle</label>
+                                    <select id="salle" name="salle" class="mt-1 block w-md pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                        {% for salle in salles %}
+                                        <option value="{{ salle.id }}">{{ salle.nom }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <button type="submit" id="submit-assiduite" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Soumettre</button>
+                                    <button type="button" id="cancel-assiduite" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Annuler</button>
+                                </div>
+                                {% csrf_token %}
+                            </form>
+                            <div id="table-container" class="mt-4"></div>`;
+                        break;
+                    case 'matieres':
+                        contentHtml = `
+                            <div class="main-title">
+                                <p class="fw-600">Gestion des matières</p>
+                            </div>
+                            <p>Gestion des matières.</p>`;
+                        break;
+                    case 'presences':
+                        contentHtml = `
+                         <style>
+            .hidden-form {
+                display: none !important;
+            }
+        </style>
+                            <div class="main-title">
+                                <p class="fw-600">Gestion des présences</p>
+                            </div>
+                            <div id="form-container">
+                            <form id="assiduite-form" method="post" action="{% url 'enregistrer_assiduite' %}">
+                              
+                               <div class="mb-4">
+                                    <label for="niveau" class="block text-sm font-medium text-gray-700">Niveau</label>
+                                    <select id="niveau" name="niveau" class="mt-1 block w-md pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                        {% for niveau in niveaux %}
+                                        <option value="{{ niveau.id }}">{{ niveau.nom }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="matiere" class="block text-sm font-medium text-gray-700">Matière</label>
+                                    <select id="matiere" name="matiere" class="mt-1 block w-md pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                        {% for matiere in matieres %}
+                                        <option value="{{ matiere.id }}">{{ matiere.nom }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="salle" class="block text-sm font-medium text-gray-700">Salle</label>
+                                    <select id="salle" name="salle" class="mt-1 block w-md pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                        {% for salle in salles %}
+                                        <option value="{{ salle.id }}">{{ salle.nom }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <button type="submit" id="submit-assiduite" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Soumettre</button>
+                                    <button type="button" id="cancel-assiduite" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Annuler</button>
+                                </div>
+                                {% csrf_token %}
+                            </form>
+                             </div>
+                            <div id="table-container" class="mt-4"></div>`;
+                        break;
+                    case 'deconnexion':
+                        contentHtml = `
+                            <div class="main-title">
+                                <p class="fw-600">Déconnexion</p>
+                            </div>
+                            <form method="post" action="{% url 'deconnexion' %}" id="logout-form">
+                                {% csrf_token %}
+                                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                    Déconnexion
+                                </button>
+                            </form>`;
+                        break;
+                    default:
+                        contentHtml = `
+                            <div class="main-title">
+                                <p class="fw-600">Bienvenue</p>
+                            </div>
+                            <p>Sélectionnez une option du menu pour commencer.</p>`;
+                        break;
                 }
 
                 mainContent.innerHTML = contentHtml;
+
+                // Attacher l'événement au formulaire après l'insertion de HTML
+                if (content === 'presences') {
+                    attachFormSubmitEvent();
+                }
             });
         });
+
+
+
+        // ****new code enregistrer assiduité code exact****
+        const assiduiteForm = document.getElementById("assiduite-form");
+        const tableContainer = document.getElementById("table-container");
+
+        document.addEventListener("DOMContentLoaded", function () {
+            document.body.addEventListener("change", function (event) {
+                if (event.target && event.target.id === "niveau") {
+                    const niveauSelect = event.target;
+                    const matiereSelect = document.getElementById("matiere");
+                    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                    if (!niveauSelect || !matiereSelect) {
+                        console.error("❌ Sélecteurs non trouvés !");
+                        return;
+                    }
+
+                    const niveauId = niveauSelect.value;
+                    console.log("🔹 Niveau sélectionné :", niveauId);
+
+                    if (!niveauId) return;
+
+                    fetch("{% url 'enregistrer_assiduite' %}", {
+                        method: 'POST',
+                        body: new URLSearchParams({ niveau: niveauId }),
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': csrfToken
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log("📌 Matières reçues :", data.matieres);
+
+                            // Vider le select
+                            matiereSelect.innerHTML = `<option value="">Sélectionnez une matière</option>`;
+
+                            // Ajouter les nouvelles matières
+                            if (data.matieres && data.matieres.length > 0) {
+                                data.matieres.forEach(matiere => {
+                                    let option = document.createElement("option");
+                                    option.value = matiere.id;
+                                    option.textContent = matiere.nom;
+                                    matiereSelect.appendChild(option);
+                                });
+                            } else {
+                                console.warn("⚠️ Aucune matière trouvée !");
+                            }
+                        })
+                        .catch(error => console.error("❌ Erreur lors du chargement des matières :", error));
+                }
+            });
+        });
+
+
+        // code pour la gestion de l'assiduité apres le formulaire code exact
+        const enregistrerAssiduiteUrl = "{% url 'enregistrer_assiduite' %}";
+        const formContainer = document.getElementById("assiduite-form"); // ✅ Récupérer le formulaire pour le masquer après soumission
+
+
+        function attachFormSubmitEvent() {
+            document.getElementById('assiduite-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(e.target);
+
+                fetch(enregistrerAssiduiteUrl, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                })
+                    .then(response => {
+                        return response.json();
+                        console.log("📌 Données reçues après soumission :", data);
+
+                    })
+                    .then(data => {
+                        if (data.eleves) {
+                            const tableHtml = `
+                          <div class="flex justify-between mb-4">
+        <!-- 🔍 Zone de Recherche -->
+        <input type="text" id="searchInput" placeholder="Rechercher un élève..." 
+            class="p-2 border rounded shadow-sm focus:ring focus:border-blue-300">
+
+        <!-- 📌 Boutons -->
+        <div class="flex space-x-2">
+            <button id="saveButton" onclick="attachSaveButtonEvent()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Enregistrer</button>
+            <button id="editButton" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Modifier</button>
+            <button id="printButton" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Imprimer</button>
+        </div>
+    </div>
+                        
+                            <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+                                <thead>
+                                    <tr class="bg-gray-100 text-left">
+                                        <th class="px-4 py-2 border-b">Nom</th>
+                                        <th class="px-4 py-2 border-b">Prénom</th>
+                                        <th class="px-4 py-2 border-b">Sexe</th>
+                                        <th class="px-4 py-2 border-b">Classe</th>
+                                        <th class="px-4 py-2 border-b">Présence</th>
+                                        <th class="px-4 py-2 border-b">Observation</th>
+                                        <th class="px-4 py-2 border-b">Date</th> 
+                                        <th class="px-4 py-2 border-b">Heure</th> 
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.eleves.map(eleve => {
+                                const now = new Date(); // 📌 Récupérer la date et l'heure actuelles
+                                const date = now.toLocaleDateString(); // Format: JJ/MM/AAAA
+                                const time = now.toLocaleTimeString(); // Format: HH:MM:SS
+                                return `
+                                        <tr data-eleve-id="${eleve.id}">
+                                            <td class="px-4 py-2 border-b">${eleve.nom}</td>
+                                            <td class="px-4 py-2 border-b">${eleve.prenom}</td>
+                                            <td class="px-4 py-2 border-b">${eleve.sexe}</td>
+                                            <td class="px-4 py-2 border-b">${eleve.classe}</td>
+                                            <td class="px-4 py-2 border-b text-center"><input type="checkbox" name="present_${eleve.id} id="present_${eleve.id}"></td>
+                                            <td class="px-4 py-2 border-b"><input type="text" name="observation_${eleve.id}" class="px-2 py-1 border rounded"></td>
+                                            <td class="px-4 py-2 border-b">${date}</td> 
+                                            <td class="px-4 py-2 border-b">${time}</td>
+                                        </tr>
+                                    `}).join('')}
+                                </tbody>
+                            </table>
+                        `;
+
+                            document.getElementById("form-container").classList.add("hidden-form");
+
+                            document.getElementById('table-container').innerHTML = tableHtml;
+                        } else {
+                            alert('Aucun élève trouvé pour cette salle et cette matière.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur:', error);
+                        alert('Une erreur est survenue lors de la soumission du formulaire.');
+                    });
+            });
+        }
+
+
+
+        // ✅ Fonction de filtrage des élèves
+        document.getElementById("searchInput").addEventListener("input", function () {
+            let searchValue = this.value.toLowerCase();
+            let tableRows = document.querySelectorAll("#table-container tbody tr");
+
+            tableRows.forEach(row => {
+                let rowText = row.innerText.toLowerCase();
+                if (rowText.includes(searchValue)) {
+                    row.style.display = ""; // Afficher la ligne si elle correspond à la recherche
+                } else {
+                    row.style.display = "none"; // Masquer sinon
+                }
+            });
+        });
+
+
+        // ******code pour enregistrer l'assiduité dans la base de données
+        // Fonction pour attacher l'événement au bouton "Enregistrer"
+        document.addEventListener("DOMContentLoaded", function () {
+    // Ajoutez ici votre code pour générer dynamiquement l'élément enseignant-id, si nécessaire
+    const formContainer = document.getElementById("form-container");
+    formContainer.innerHTML = '<input type="text" id="enseignant-id" value="12345">'; // Exemple d'ajout
+
+    attachSaveButtonEvent(); // Assurez-vous que l'écouteur d'événements est attaché
+});
+
+function attachSaveButtonEvent() {
+    const saveButton = document.getElementById("saveButton");
+    if (saveButton) {
+        saveButton.onclick = function () {
+            console.log("✅ Bouton 'Enregistrer' cliqué !");
+            let elevesData = [];
+            document.querySelectorAll("#table-container tbody tr").forEach(row => {
+                let eleveId = row.getAttribute("data-eleve-id");
+                let present = row.querySelector("input[type='checkbox']").checked;
+                let observation = row.querySelector(`input[name='observation_${eleveId}']`).value;
+
+                elevesData.push({
+                    id: eleveId,
+                    present: present,
+                    observation: observation
+                });
+            });
+
+            let matiereId = document.getElementById("matiere").value;
+            let salleId = document.getElementById("salle").value;
+
+            // Assurez-vous que l'élément enseignant-id existe avant de l'utiliser
+            let enseignantIdElement = document.getElementById("enseignant-id");
+            let enseignantId = enseignantIdElement ? enseignantIdElement.value : null;
+
+            if (!enseignantId) {
+                console.error("Élément 'enseignant-id' non trouvé !");
+                alert("L'ID de l'enseignant est introuvable.");
+                return; // Stoppez l'exécution si l'ID est introuvable
+            }
+
+            let formData = {
+                matiere: matiereId,
+                salle: salleId,
+                enseignant: enseignantId,
+                eleves: elevesData
+            };
+
+            console.log("📌 Données envoyées :", formData);
+
+            fetch(addAssiduiteUrl, {
+                method: "POST",
+                body: JSON.stringify(formData),
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("✅ Assiduité enregistrée avec succès !");
+                } else {
+                    alert("❌ Erreur lors de l'enregistrement !");
+                }
+            })
+            .catch(error => {
+                console.error("❌ Erreur réseau :", error);
+                alert("Erreur de connexion avec le serveur !");
+            });
+        };
+    } else {
+        console.error("Élément 'saveButton' non trouvé !");
+    }
+}
+
+
+
     </script>
 </body>
+
 </html>

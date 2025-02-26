@@ -21,5 +21,11 @@ from.import views
 urlpatterns = [
    
     path('', views.tab_enseignant, name="tab_enseignant"),
- 
+  path('gestion_assiduite/', views.gestion_assiduite, name="gestion_assiduite"),
+  path('gestion-presences/', views.gestion_presences, name='gestion_presences'),
+  path('enregistrer_assiduite/', views.enregistrer_assiduite, name='enregistrer_assiduite'),
+  #path('get-matieres/<int:niveau_id>/', views.get_matieres_par_niveau, name='get_matieres_par_niveau'), # url de la fonction de trier des matiere par nivveau
+  path('get-eleves/', views.get_eleves, name='get_eleves'),
+  path('gestion_notes/', views.gestion_notes, name='gestion_notes'),
+  path('add_assiduite/', views.add_assiduite, name='add_assiduite'),
 ]

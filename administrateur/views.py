@@ -24,6 +24,7 @@ def tab_administrateur(request):
         "liste_parent": parent,
         "liste_salle": salle,
         "liste_eleve": eleve,
+        "salles":salle,
     }
 
      return render(request, "tableau/indexadmin.html", context   )
@@ -70,7 +71,7 @@ def addenseignant(request):
 @login_required
 def addparent(request):
     if request.session["privilege"] != "AD":
-        return HttpResponse("Gars, tu n'as accès à cette page !")
+        return HttpResponse(" tu n'as accès à cette page !")
 
     if request.method == "POST":
         # Récupérons les informations pour la création d'un utilisateur
@@ -105,7 +106,7 @@ def addparent(request):
 @login_required
 def addsalle(request):
     if request.session.get("privilege") != "AD":
-        return HttpResponse("Gars, tu n'as accès à cette page !")
+        return HttpResponse("tu n'as pas accès à cette page !")
 
     if request.method == "POST":
         # Récupérer les informations pour la création d'une salle
@@ -121,7 +122,24 @@ def addsalle(request):
             # Récupérer la liste actualisée des salles après l'ajout
         salles = Salle.objects.all()
         return render(request, "tableau/indexadmin.html", {'liste_salle': salles})
+# code pour ajouter une matiere
+@login_required
+def addmatiere(request):
+    if request.session.get("privilege") != "AD":
+        return HttpResponse("tu n'as pas accès à cette page !")
 
+    if request.method == "POST":
+        # Récupérer les informations pour la création d'une salle
+        nom = request.POST.get('nom')
+        coefficient = request.POST.get('coefficient')
+            # Créer une nouvelle salle
+        new_matiere = Salle(nom=nom,coefficient=coefficient )
+        new_matiere.save()
+
+            # Récupérer la liste actualisée des salles après l'ajout
+        matieres = matieres.objects.all()
+        return render(request, "tableau/indexadmin.html", {'liste_matiere': matieres})
+    
 # la fonction qui permet d'ajouter un eleve
 @login_required
 def addeleve(request):
@@ -132,12 +150,18 @@ def addeleve(request):
         sexe = request.POST.get('sexe')
         quartier = request.POST.get('quartier')
         date_naissance = request.POST.get('date_naissance')
-        classe = request.POST.get('classe')
+        classe_id = request.POST.get('classe')  # Récupère l'ID de la salle (classe)
         tel_parent = request.POST.get('tel_parent')
 
         # Vérifier que tous les champs requis sont présents
-        if not (noms and prenoms and sexe and quartier and date_naissance and classe and tel_parent):
+        if not (noms and prenoms and sexe and quartier and date_naissance and classe_id and tel_parent):
             return JsonResponse({'success': False, 'error': 'Tous les champs sont obligatoires.'}, status=400)
+
+        # Récupérer l'instance de la salle (classe)
+        try:
+            classe = Salle.objects.get(id=classe_id)  # Utilisation de l'ID pour obtenir l'instance
+        except Salle.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Classe non trouvée.'}, status=400)
 
         # Créer un nouvel élève
         new_eleve = Eleve(
@@ -146,18 +170,17 @@ def addeleve(request):
             sexe=sexe,
             quartier=quartier,
             date_naissance=date_naissance,
-            classe=classe,
+            salle=classe,  # Assigner l'instance de la salle
             tel_parent=tel_parent
         )
         new_eleve.save()
-
-    # Dans tous les cas, récupérer la liste des élèves pour l'afficher
+        
+    # Récupérer la liste des élèves pour l'afficher
     eleve = Eleve.objects.all()
 
     # Retourner la page avec la liste des élèves, qu'il s'agisse d'une requête GET ou après une requête POST réussie
-    return render(request, "tableau/indexadmin.html", {'liste_eleve': eleve})
+    return render(request, "tableau/indexadmin.html", {'liste_eleve': eleve, 'salles': Salle.objects.all()})
 
-# la fonction qui permet d'afficher le contenu du formulaire lors d'une modification 
 @login_required
 def get_enseignant(request, id):
     if request.session.get("privilege") != "AD":

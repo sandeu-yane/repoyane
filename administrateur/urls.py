@@ -24,6 +24,7 @@ urlpatterns = [
     path('addenseignant/', views.addenseignant, name="addenseignant"),
     path('addparent/', views.addparent, name="addparent"),
     path('addsalle/', views.addsalle, name="addsalle"),
+    path('addmatiere/', views.addmatiere, name="addmatiere"),
     #path('get_enseignant/<int:id>/', views.get_enseignant, name="get_enseignant"),
     #path(' delete_enseignant/<int:id>/', views.delete_enseignant, name='delete_enseignant'),
     path('addeleve/', views.addeleve, name="addeleve"),

@@ -51,23 +51,23 @@
                     <span title="notes" class="material-icons-outlined">
                         grade
                     </span>
-                    <span class="label-item">consulter les notes</span>
+                    <span class="label-item">Consulter les notes</span>
                 </li>
                 <li class="sidebar-list-item" data-content="assiduité">
                     <span title="assiduité" class="material-icons-outlined">
                         task
                     </span>
-                    <span class="label-item">consulter l'assiduité</span>
+                    <span class="label-item">Consulter l'assiduité</span>
                 </li>
                 <li class="sidebar-list-item" data-content="statistique">
                     <span title="CTM" class="material-icons-outlined">
                         bar_chart
                     </span>
-                   <span class="label-item">consulter les statistiques</span>
+                    <span class="label-item">Consulter les statistiques</span>
                 </li>
                 <li class="sidebar-list-item" data-content="deconnexion">
                     <span title="deconnexion" class="material-icons-outlined">
-                        deconnexion
+                        exit_to_app
                     </span>
                     <span class="label-item">Deconnexion</span>
                 </li>
@@ -88,7 +88,6 @@
         sidebarItems.forEach(item => {
             item.addEventListener('click', () => {
                 const content = item.getAttribute('data-content');
-                
                 let contentHtml = '';
 
                 if (content === 'notes') {
@@ -102,21 +101,19 @@
                         <div class="main-title">
                             <p class="fw-600">Assiduité</p>
                         </div>
-                        `;
+                        <p>Affichage de l'assiduité.</p>`;
                 } else if (content === 'statistique') {
                     contentHtml = `
                         <div class="main-title">
                             <p class="fw-600">Statistiques</p>
                         </div>
                         <p>Affichage des statistiques.</p>`;
-                }
-        // code pour la deconnexion 
-        else if (content === 'deconnexion') {
+                } else if (content === 'deconnexion') {
                     contentHtml = `
                         <div class="main-title">
                             <p class="fw-600">Deconnexion</p>
                         </div>
-                         <form method="post" action="{% url 'deconnexion' %}" id="logout-form">
+                        <form method="post" action="{% url 'deconnexion' %}" id="logout-form">
                             {% csrf_token %}
                             <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                                 Déconnexion
@@ -124,9 +121,6 @@
                         </form>`;
                 }
 
-
-
-                
                 mainContent.innerHTML = contentHtml;
             });
         });
