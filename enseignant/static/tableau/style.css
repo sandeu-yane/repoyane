@@ -10,9 +10,9 @@
     --sky-blue: hsl(200, 100%, 50%);  /* Couleur bleu ciel */
 }
 
-body {
-    background: var(--lightly);
-}
+/* body { */
+    /* background: var(--lightly); */
+/*}*/
 
 .material-icons-outlined {
     vertical-align: middle;
@@ -46,7 +46,7 @@ body {
 /* ======sidebar======== */
 #sidebar {
     grid-area: sidebar;
-    background-color: var(--light-red); /* Couleur rouge légère */
+    background-color: var(--light-red);  /*Couleur rouge légère */
     color: var(--text-cyan);
     height: 100%;
     overflow-y: auto;
@@ -82,7 +82,7 @@ body {
     padding: 40px;
     transition: 0.3s ease-in;
     cursor: pointer;
-    background-color: rgba(255, 255, 255, 0.2);
+    /* background-color: rgba(255, 255, 255, 0.2); */
 }
 
 /* =======main======= */
@@ -112,5 +112,16 @@ body {
 
     .sidebar-brand > .label-title {
         display: none;
+    }
+}
+.zap{
+animation: bougeotte;padding-left: 50px;width:70px;
+}
+@keyframes bougeotte{
+    from{
+        transform: translateY(-10px);
+    }
+    to{
+        transform: translateY(10px);
     }
 }

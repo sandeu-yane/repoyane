@@ -8,11 +8,37 @@
     <title>Dashboard</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="stylesheet" href="{% static 'tableau/style.css' %}">
 </head>
+<style>
+    /* .hidden {
+        display: none;
+    } */
+   
+    .imge{
+        position:relative; left:70px;
+        border-radius:50%;justify-content: center;align-items: center;
+    }
+    body{
+        /* background-image: url("{% static 'images/logoapp.jpg' %}");   */
+        background-color: #fff; 
+        background-size: 750px 700px;
+        background-position:center;
+        background-repeat: no-repeat;
+        justify-content: end;
+    }
+    .main-title{
+        position:relative;
+        left:10%;
+    }
+    #emploi-form{position:relative;
+        left:10%
+    }
+</style>
 
-<body>
-    <div class="grid-container">
+     <body>
+     <div class="grid-container">
         <header class="header">
             <div class="menu-icon">
                 <span class="material-icons-outlined" id="menu-icon">menu</span>
@@ -35,14 +61,20 @@
                 </div>
             </div>
 
+            <style>
+                #sidebar{
+                    background:rgb(46, 42, 42);
+                }
+            </style>
+
+            <div class="imge">
+                <img src="/static/images/logoapp.png" width ="100px">
+            </div>
+
             <ul class="sidebar-list">
                 <li class="sidebar-list-item" data-content="notes">
                     <span title="notes" class="material-icons-outlined">grade</span>
                     <span class="label-item">Gérer les notes</span>
-                </li>
-                <li class="sidebar-list-item" data-content="matieres">
-                    <span title="Gestion matieres" class="material-icons-outlined">subject</span>
-                    <span class="label-item">Gérer les Matières</span>
                 </li>
                 <li class="sidebar-list-item" data-content="presences">
                     <span title="Gestion d'assiduité" class="material-icons-outlined">check_circle</span>
@@ -62,7 +94,7 @@
         </main>
     </div>
 
-    <script>
+     <script>
         const sidebarItems = document.querySelectorAll('.sidebar-list-item');
         const mainContent = document.getElementById('main-content');
 
@@ -78,8 +110,17 @@
                                 <p class="fw-600">Notes</p>
                             </div>
                             <p>Gestion des notes.</p>
-                             <form id="assiduite-form" method="post" action="{% url 'gestion_notes' %}">
+                            <div id="form-container-note">
+                             <form id="notes-form" method="post" action="{% url 'recuperer_eleves_par_salle' %}">
                                 <div class="mb-4">
+                                <div class="mb-4">
+                                    <label for="niveau" class="block text-sm font-medium text-gray-700">Niveau</label>
+                                    <select id="niveau" name="niveau" class="mt-1 block w-md pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                        {% for niveau in niveaux %}
+                                        <option value="{{ niveau.id }}">{{ niveau.nom }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
                                     <label for="matiere" class="block text-sm font-medium text-gray-700">Matière</label>
                                     <select id="matiere" name="matiere" class="mt-1 block w-md pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                                         {% for matiere in matieres %}
@@ -94,33 +135,41 @@
                                         <option value="{{ salle.id }}">{{ salle.nom }}</option>
                                         {% endfor %}
                                     </select>
-                                </div>
+                                    </div>
+                                      <div class="mb-4">
+                                    <label for="sequence" class="block text-sm font-medium text-gray-700">Séquence</label>
+                                     <select id="sequence" name="sequence" class="mt-1 block w-md border rounded">
+                                        <option value="1">Séquence 1</option>
+                                         <option value="2">Séquence 2</option>
+                                         <option value="3">Séquence 3</option>
+                                        <option value="4">Séquence 4</option>
+                                        <option value="5">Séquence 5</option>
+                                        <option value="6">Séquence 6</option>
+                                        </select>
+                                            </div>
+                                
                                 <div class="flex space-x-4">
-                                    <button type="submit" id="submit-assiduite" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Soumettre</button>
-                                    <button type="button" id="cancel-assiduite" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Annuler</button>
+                                    <button type="submit" id="submit-note" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Soumettre</button>
+                                    <button type="button" id="cancel-note" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Annuler</button>
                                 </div>
                                 {% csrf_token %}
                             </form>
-                            <div id="table-container" class="mt-4"></div>`;
-                        break;
-                    case 'matieres':
-                        contentHtml = `
-                            <div class="main-title">
-                                <p class="fw-600">Gestion des matières</p>
                             </div>
-                            <p>Gestion des matières.</p>`;
+                            <div id="notes-table-container" class="mt-4"></div>`;
                         break;
+                    
                     case 'presences':
                         contentHtml = `
                          <style>
             .hidden-form {
                 display: none !important;
+
             }
         </style>
                             <div class="main-title">
                                 <p class="fw-600">Gestion des présences</p>
                             </div>
-                            <div id="form-container">
+                            <div id="form-container-assiduite">
                             <form id="assiduite-form" method="post" action="{% url 'enregistrer_assiduite' %}">
                               
                                <div class="mb-4">
@@ -158,6 +207,12 @@
                         break;
                     case 'deconnexion':
                         contentHtml = `
+                         <style>
+             .hidden-form-note {
+                display: none !important;
+
+            }
+        </style>
                             <div class="main-title">
                                 <p class="fw-600">Déconnexion</p>
                             </div>
@@ -181,8 +236,12 @@
 
                 // Attacher l'événement au formulaire après l'insertion de HTML
                 if (content === 'presences') {
-                    attachFormSubmitEvent();
-                }
+                  attachFormSubmitEvent();
+                    }
+
+                if (content === 'notes') {
+                      attachNotesFormSubmitEvent();
+                    }
             });
         });
 
@@ -315,7 +374,7 @@
                             </table>
                         `;
 
-                            document.getElementById("form-container").classList.add("hidden-form");
+                            document.getElementById("form-container-assiduite").classList.add("hidden-form");
 
                             document.getElementById('table-container').innerHTML = tableHtml;
                         } else {
@@ -331,36 +390,10 @@
 
 
 
-        // ✅ Fonction de filtrage des élèves
-        document.getElementById("searchInput").addEventListener("input", function () {
-            let searchValue = this.value.toLowerCase();
-            let tableRows = document.querySelectorAll("#table-container tbody tr");
-
-            tableRows.forEach(row => {
-                let rowText = row.innerText.toLowerCase();
-                if (rowText.includes(searchValue)) {
-                    row.style.display = ""; // Afficher la ligne si elle correspond à la recherche
-                } else {
-                    row.style.display = "none"; // Masquer sinon
-                }
-            });
-        });
-
 
         // ******code pour enregistrer l'assiduité dans la base de données
         // Fonction pour attacher l'événement au bouton "Enregistrer"
-        document.addEventListener("DOMContentLoaded", function () {
-    // Ajoutez ici votre code pour générer dynamiquement l'élément enseignant-id, si nécessaire
-    const formContainer = document.getElementById("form-container");
-    formContainer.innerHTML = '<input type="text" id="enseignant-id" value="12345">'; // Exemple d'ajout
-
-    attachSaveButtonEvent(); // Assurez-vous que l'écouteur d'événements est attaché
-});
-
-function attachSaveButtonEvent() {
-    const saveButton = document.getElementById("saveButton");
-    if (saveButton) {
-        saveButton.onclick = function () {
+        function attachSaveButtonEvent() {
             console.log("✅ Bouton 'Enregistrer' cliqué !");
             let elevesData = [];
             document.querySelectorAll("#table-container tbody tr").forEach(row => {
@@ -377,25 +410,17 @@ function attachSaveButtonEvent() {
 
             let matiereId = document.getElementById("matiere").value;
             let salleId = document.getElementById("salle").value;
-
-            // Assurez-vous que l'élément enseignant-id existe avant de l'utiliser
-            let enseignantIdElement = document.getElementById("enseignant-id");
-            let enseignantId = enseignantIdElement ? enseignantIdElement.value : null;
-
-            if (!enseignantId) {
-                console.error("Élément 'enseignant-id' non trouvé !");
-                alert("L'ID de l'enseignant est introuvable.");
-                return; // Stoppez l'exécution si l'ID est introuvable
-            }
+           
 
             let formData = {
                 matiere: matiereId,
                 salle: salleId,
-                enseignant: enseignantId,
+               
                 eleves: elevesData
             };
 
             console.log("📌 Données envoyées :", formData);
+            const addAssiduiteUrl = "{% url 'add_assiduite' %}";
 
             fetch(addAssiduiteUrl, {
                 method: "POST",
@@ -405,23 +430,267 @@ function attachSaveButtonEvent() {
                     "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
                 }
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert("✅ Assiduité enregistrée avec succès !");
-                } else {
-                    alert("❌ Erreur lors de l'enregistrement !");
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("✅ Assiduité enregistrée avec succès !");
+                    } else {
+                        alert("❌ Erreur lors de l'enregistrement !");
+                    }
+                })
+                .catch(error => {
+                    console.error("❌ Erreur réseau :", error);
+                    alert("Erreur de connexion avec le serveur !");
+                });
+        }
+
+
+ 
+  // new code
+
+        //const formContainer = document.getElementById("assiduite-form"); // ✅ Récupérer le formulaire pour le masquer après soumission
+            //const tableContainer = document.getElementById("table-container"); 
+            const recupererElevesUrl = "{% url 'recuperer_eleves_par_salle' %}";
+const enregistrerNotesUrl = "{% url 'enregistrer_notes' %}";
+
+// Fonction pour attacher l'événement de soumission du formulaire des notes
+function attachNotesFormSubmitEvent() {
+    const notesForm = document.getElementById('notes-form');
+    if (notesForm) { // Vérification que le formulaire existe
+        notesForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+
+            fetch(recupererElevesUrl, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
                 }
             })
-            .catch(error => {
-                console.error("❌ Erreur réseau :", error);
-                alert("Erreur de connexion avec le serveur !");
-            });
-        };
-    } else {
-        console.error("Élément 'saveButton' non trouvé !");
+            .then(response => response.json())
+            .then(data => {
+                if (data.eleves) {
+                    // Masquer le formulaire
+                    document.getElementById("form-container-note").classList.add("hidden-form-note");
+
+                    let tableHtml = `
+                        <div class="flex justify-between mb-4">
+                            <input type="text" id="searchInput" placeholder="Rechercher un élève..." 
+                                   class="p-2 border rounded shadow-sm focus:ring focus:border-blue-300">
+                            <div class="flex space-x-2">
+                                <button id="saveButton" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Enregistrer</button>
+                                <button id="editButton" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Modifier</button>
+                                <button id="pdfButton" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">PDF</button>
+                            </div>
+                        </div>
+                        <table id="notesTable" class="min-w-full bg-white border">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="text-center">Nom</th>
+                                    <th class="text-center">Prénom</th>
+                                    <th class="text-center">Sexe</th>
+                                    <th class="text-center">Classe</th>
+                                    <th class="text-center">Séquence</th>
+                                    <th class="text-center">Note</th>
+                                    <th class="text-center">Appréciation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.eleves.map(eleve => `
+                                    <tr data-eleve-id="${eleve.id}">
+                                        <td class="text-center">${eleve.nom}</td>
+                                        <td class="text-center">${eleve.prenom}</td>
+                                        <td class="text-center">${eleve.sexe}</td>
+                                        <td class="text-center">${eleve.classe}</td>
+                                        <td class="text-center">${formData.get('sequence')}</td>
+                                        <td class="text-center"><input type="number" name="note_${eleve.id}" class="border rounded text-center"></td>
+                                        <td class="text-center"><input type="text" name="appreciation_${eleve.id}" class="border rounded text-center"></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>`;
+
+                    document.getElementById("notes-table-container").innerHTML = tableHtml;
+
+                    // Attacher des événements aux nouveaux boutons
+                    attachButtonEvents();
+                } else {
+                    alert("Aucun élève trouvé !");
+                }
+            })
+            .catch(error => console.error("❌ Erreur :", error));
+        });
     }
 }
+// code pour add notes
+function saveNotes() {
+    console.log("✅ Sauvegarde des notes en cours...");
+
+    let elevesData = [];
+    document.querySelectorAll("#notesTable tbody tr").forEach(row => {
+        let eleveId = row.getAttribute("data-eleve-id"); // Vérifie si l'ID est bien récupéré
+        if (!eleveId) {
+            console.warn("⚠️ Élève sans ID détecté, ligne ignorée.");
+            return;
+        }
+
+        let noteInput = row.querySelector(`input[name='note_${eleveId}']`);
+        let appreciationInput = row.querySelector(`input[name='appreciation_${eleveId}']`);
+
+        if (!noteInput || !appreciationInput) {
+            console.warn(`⚠️ Input manquant pour l'élève ${eleveId}, ligne ignorée.`);
+            return;
+        }
+
+        elevesData.push({
+            id: eleveId,
+            note: noteInput.value,
+            appreciation: appreciationInput.value
+        });
+    });
+
+    if (elevesData.length === 0) {
+        alert("❌ Aucune donnée valide à enregistrer !");
+        return;
+    }
+
+    let matiereId = document.getElementById("matiere")?.value;
+    let salleId = document.getElementById("salle")?.value;
+    let sequence = document.getElementById("sequence")?.value;
+
+    if (!matiereId || !salleId || !sequence) {
+        alert("❌ Veuillez sélectionner une matière, une salle et une séquence !");
+        return;
+    }
+
+    let formData = {
+        matiere: matiereId,
+        salle: salleId,
+        sequence: sequence,
+        eleves: elevesData
+    };
+
+    console.log("📌 Données envoyées :", formData);
+
+    fetch(enregistrerNotesUrl, {
+        method: "POST",
+        body: JSON.stringify(formData),
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]')?.value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("✅ Notes enregistrées avec succès !");
+        } else {
+            alert("❌ Erreur lors de l'enregistrement !");
+        }
+    })
+    .catch(error => {
+        console.error("❌ Erreur réseau :", error);
+        alert("Erreur de connexion avec le serveur !");
+    });
+}
+
+//fin code add note
+
+// Fonction pour attacher des événements aux boutons
+function attachButtonEvents() {
+    const saveButton = document.getElementById('saveButton');
+    const editButton = document.getElementById('editButton');
+    const pdfButton = document.getElementById('pdfButton');
+
+    if (saveButton) {
+        saveButton.addEventListener('click', () => {
+            // Logique pour enregistrer
+            saveNotes();
+            //alert("Enregistrer les notes !");
+        });
+    }
+    
+
+
+    if (editButton) {
+        editButton.addEventListener('click', () => {
+            // Logique pour modifier
+            alert("Modifier les notes !");
+        });
+    }
+
+    if (pdfButton) {
+        pdfButton.addEventListener('click', () => {
+            generatePDF();
+        });
+    }
+}
+
+// Fonction pour générer le PDF
+function generatePDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(12);
+    doc.text("Rapport de Notes", 14, 20);
+
+    const table = document.getElementById("notesTable");
+    const rows = Array.from(table.rows);
+    const data = rows.map(row => {
+        return Array.from(row.cells).map(cell => {
+            const input = cell.querySelector('input');
+            return input ? input.value : cell.innerText;
+        });
+    });
+
+    doc.autoTable({
+        head: [['Nom', 'Prénom', 'Sexe', 'Classe', 'Note', 'Appréciation']],
+        body: data.slice(1), // Ignorer l'en-tête
+    });
+
+    doc.save("rapport_notes.pdf");
+}
+
+// Fonction pour filtrer les salles en fonction du niveau pour les NOTES
+function handleNiveauChange() {
+    document.body.addEventListener("change", function (event) {
+        if (event.target && event.target.id === "niveau-note") {
+            const niveauId = event.target.value;
+            const salleSelect = document.getElementById("salle-note");
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            if (!niveauId) return;
+
+            fetch(recupererElevesUrl, {
+                method: 'POST',
+                body: new URLSearchParams({ niveau: niveauId }),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                salleSelect.innerHTML = `<option value="">Sélectionnez une salle</option>`;
+                data.salles.forEach(salle => {
+                    salleSelect.innerHTML += `<option value="${salle.id}">${salle.nom}</option>`;
+                });
+            })
+            .catch(error => console.error("❌ Erreur lors du chargement des salles :", error));
+        }
+    });
+}
+
+// Initialisation après le chargement du DOM
+document.addEventListener("DOMContentLoaded", function () {
+    handleNiveauChange();                // Attacher l'événement pour le niveau
+    attachNotesFormSubmitEvent();        // Attacher l'événement de soumission du formulaire
+});
+       
+
+       
+
 
 
 

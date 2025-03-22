@@ -8,16 +8,37 @@
     <title>Dashboard</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="{% static 'tableau/style.css' %}">
     <style>
         .hidden {
             display: none;
         }
+        
+           
+            
+        
+        .imge{
+            position:relative; left:70px;
+            border-radius:50%;justify-content: center;align-items: center;
+        }
+        body{
+            background-color: white;
+            background-image: url("{% static 'images/logoapp.jpg' %}");
+            background-size: 400px 200px;
+            background-position:center;
+        }
     </style>
 </head>
 
 <body>
+    
+    
+
+    
     <div class="grid-container">
+
+       
         <header class="header">
             <div class="menu-icon">
                 <span class="material-icons-outlined" id="menu-icon">
@@ -45,11 +66,18 @@
         <aside id="sidebar">
             <div class="sidebar-brand">
                 <div class="sidebar-title">
-                    <span title="Menu" class="material-icons-outlined">
-                        menu
-                    </span>
-                    <span class="label-title">MENU</span>
+                    
                 </div>
+            </div>
+
+            <style>
+                #sidebar{
+                    background:rgb(46, 42, 42);
+                }
+            </style>
+
+            <div class="imge">
+                <img src="/static/images/logoapp.png" width ="100px">
             </div>
 
             <ul class="sidebar-list">
@@ -89,6 +117,12 @@
                     </span>
                     <span class="label-item">Gérer les notes</span>
                 </li>
+                <li class="sidebar-list-item" data-content="emploie">
+                    <span title="Gérer les emploies de temps" class="material-icons-outlined">
+                        grade
+                    </span>
+                    <span class="label-item">Gérer les emploies de temps</span>
+                </li>
                 <li class="sidebar-list-item" data-content="assiduite">
                     <span title="Gérer l'assiduité" class="material-icons-outlined">
                         check_circle
@@ -117,6 +151,7 @@
         </main>
     </div>
 
+
     <script>
        document.addEventListener('DOMContentLoaded', function () {
     const sidebarItems = document.querySelectorAll('.sidebar-list-item');
@@ -131,10 +166,46 @@
                 case 'notes':
                     contentHtml = `
                         <div class="main-title">
-                            <p class="fw-600">Notes</p>
+                            <p class="fw-600">emploie</p>
                         </div>
                         <p>Affichage des notes.</p>`;
                     break;
+                    case 'emploie':
+                    contentHtml = `
+                        <div class="main-title">
+                            <p class="fw-600">EMPLOIE DE TEMP</p>
+                        </div>
+                      <div id="form-container">
+    <form id="emploi-form" method="post" action="{% url 'emploi_temps_view' %}">
+        <div class="mb-4">
+            <label for="niveau" class="block text-sm font-medium text-gray-700">Niveau</label>
+             <select id="niveau" name="niveau" class="mt-1 block w-md pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+            {% for niveau in niveaux %}
+              <option value="{{ niveau.id }}">{{ niveau.nom }}</option>
+               {% endfor %}
+              </select>
+             </div>
+
+        <div class="mb-4">
+            <label for="salle" class="block text-sm font-medium text-gray-700">Salle</label>
+            <select id="salle" name="salle" class="mt-1 block w-md pl-3 pr-10 py-2 border-gray-300 rounded-md">
+                <option value="">Sélectionnez une salle</option>
+            </select>
+      
+        <div class="flex space-x-4">
+            <button type="submit" id="submit-emploi" class="bg-blue-500 text-white font-bold py-2 px-4 rounded">Soumettre</button>
+            <button type="button" id="cancel-emploi" class="bg-gray-500 text-white font-bold py-2 px-4 rounded">Annuler</button>
+        </div>
+        {% csrf_token %}
+    </form>
+</div>
+<div id="emploi-table-container"></div>
+
+
+`;
+                    break;
+
+
                 case 'parents':
                     contentHtml = `
                         <div class="main-title">
@@ -439,6 +510,7 @@
                     <tr>
                         <th class="py-3 px-6 text-left">ID</th>
                         <th class="py-3 px-6 text-left">Nom</th>
+                        <th class="py-3 px-6 text-left">Niveau</th>
                         <th class="py-3 px-6 text-left">COEFFICIENT</th>
                         <th class="py-3 px-6 text-center">Action</th>
                     </tr>
@@ -448,6 +520,7 @@
                     <tr>
                         <td>{{ matiere.id }}</td>
                         <td>{{ matiere.nom }}</td>
+                        <td>{{ matiere.niveau }}</td>
                         <td>{{ matiere.coefficient }}</td>
                         <td class="text-center">
                             <button class="text-yellow-500 hover:text-yellow-700" onclick="editMatiere({{ matiere.id }})">
@@ -473,14 +546,25 @@
                         <input type="text" id="input-nom" name="nom" class="w-full px-4 py-2 border rounded-md" required>
                     </div>
                     <div class="mb-4">
+                                    <label for="niveau" class="block text-sm font-medium text-gray-700">Niveau</label>
+                                    <select id="niveau" name="niveau" class="mt-1 block w-md pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                        {% for niveau in niveaux %}
+                                        <option value="{{ niveau.id }}">{{ niveau.nom }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                   <div class="mb-4">
                         <label for="input-coefficient" class="block text-sm font-bold mb-2">COEFFICIENT:</label>
-                         <select id="coefficient" name="coefficient" class="mt-1 block w-md pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                    {% for coefficient in coefficients %}
-                    <option value="{{ coefficient.id }}">{{ coefficient.nom }}</option>
-                    {% endfor %}
-                </select>
-                        <!-- input type="text" id="input-coefficient" name="coefficient" class="w-full px-4 py-2 border rounded-md" required -->
+                        <input type="text" id="input-coefficient" name="coefficient" class="w-full px-4 py-2 border rounded-md" required>
                     </div>
+                    <div class="mb-4">
+                                    <label for="enseignant" class="block text-sm font-medium text-gray-700">ENSEIGNANTS</label>
+                                    <select id="enseignant" name="enseignant" class="mt-1 block w-md pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                        {% for enseignant in enseignants %}
+                                        <option value="{{ enseignant.id }}">{{ enseignant.nom }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
                    
                     <div class="flex justify-end">
                         <button type="button" id="close-modal" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mr-2">Annuler</button>
@@ -580,14 +664,14 @@
                     <div class="mb-4">
                         <label for="input-classe" class="block text-sm font-bold mb-2">CLASSE:</label>
                          <select id="classe" name="classe" class="mt-1 block w-md pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                    {% for salle in salles %}
-                    <option value="{{ salle.id }}">{{ salle.nom }}</option>
-                    {% endfor %}
+                                       {% for salle in salles %}
+                                        <option value="{{ salle.id }}">{{ salle.nom }}</option>
+                                        {% endfor %}
                 </select>
                         <!-- input type="text" id="input-classe" name="classe" class="w-full px-4 py-2 border rounded-md" required -->
                     </div>
 
-
+                    
 
                         <label for="input-tel_parent" class="block text-sm font-bold mb-2">NUMERO PARENT:</label>
                         <input type="text" id="input-tel_parent" name="tel_parent" class="w-full px-4 py-2 border rounded-md" required>
@@ -613,11 +697,15 @@
                             </button>
                         </form>`;
                     break;
-                
+             
+                    
 
   }
 
             mainContent.innerHTML = contentHtml;
+            if (content === 'emploie') {
+                  attachFormSubmitEvent();
+                    }
 
             // Gestion de l'ouverture du modal
             const openModalBtn = document.getElementById('open-modal');
@@ -1068,18 +1156,209 @@ document.getElementById("search").addEventListener("input", function () {
 });
 
 
-
 });
     });
 });
 
+// code pour gerer l'emploie de temp
+document.addEventListener("DOMContentLoaded", function () {
+    document.body.addEventListener("change", function (event) {
+        if (event.target && event.target.id === "niveau") {
+            const niveauSelect = event.target;
+            const salleSelect = document.getElementById("salle");
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            if (!niveauSelect || !salleSelect) {
+                console.error("❌ Sélecteurs non trouvés !");
+                return;
+            }
+
+            const niveauId = niveauSelect.value;
+            console.log("🔹 Niveau sélectionné :", niveauId);
+
+            if (!niveauId) return;
+            const gestionemploieUrl = "{% url 'filtrer_salles_par_niveau' %}";
+            fetch(gestionemploieUrl, {
+                method: 'POST',
+                body: new URLSearchParams({ niveau: niveauId }),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("📌 Salles reçues :", data.salles);
+
+                // Vider le select des salles
+                salleSelect.innerHTML = `<option value="">Sélectionnez une salle</option>`;
+
+                // Ajouter les nouvelles salles filtrées
+                if (data.salles && data.salles.length > 0) {
+                    data.salles.forEach(salle => {
+                        let option = document.createElement("option");
+                        option.value = salle.id;
+                        option.textContent = salle.nom;
+                        salleSelect.appendChild(option);
+                    });
+                } else {
+                    console.warn("⚠️ Aucune salle trouvée !");
+                }
+            })
+            .catch(error => console.error("❌ Erreur lors du chargement des salles :", error));
+        }
+    });
+});
+// fin code emploie
+
+
+function attachFormSubmitEvent() {
+    const emploiForm = document.getElementById('emploi-form');
+    
+    if (emploiForm) {
+        emploiForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // Empêche le rechargement de la page
+
+            const formData = new FormData(emploiForm);
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const emploieUrl = "{% url 'emploi_temps_view' %}";
+            fetch(emploieUrl, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.emploi_du_temps) {
+                    // Masquer le formulaire
+                    document.getElementById("form-container").classList.add("hidden-form");
+
+                    // Afficher le tableau dynamique
+                    afficherTableauEmploi(data);
+                } else {
+                    alert("❌ Erreur : Impossible de charger l'emploi du temps !");
+                }
+            })
+            .catch(error => console.error("❌ Erreur lors du chargement de l'emploi du temps :", error));
+        });
+    }
+}
 
 
 
 
 
- 
+// code apres formulaire emploie
+function afficherTableauEmploi(data) {
+    const container = document.getElementById("emploi-table-container");
 
+    if (!container) {
+        console.error("❌ Erreur : Le conteneur 'emploi-table-container' est introuvable !");
+        return; // Arrête l'exécution si l'élément n'existe pas
+    }
+
+    let tableHtml = `
+        <div class="flex justify-between mb-4">
+            <button id="saveButton" onclick="attachSaveButtonEvent()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Enregistrer</button>
+            <button id="editButton" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Modifier</button>
+            <button id="pdfButton" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">PDF</button>
+        </div>
+        <table id="emploiTable" class="min-w-full bg-white border">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th>HEURE / JOURS</th>
+                    <th>LUNDI</th>
+                    <th>MARDI</th>
+                    <th>MERCREDI</th>
+                    <th>JEUDI</th>
+                    <th>VENDREDI</th>
+                    <th>SAMEDI</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+    const heures = [
+        "7h30 - 8h30", "8h30 - 9h30", "9h30 - 10h30",
+        "10h30 - 11h30", "11h30 - 12h30", "12h30 - 13h30",
+        "13h30 - 14h30", "14h30 - 15h30", "15h30 - 16h30"
+    ];
+    const jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+
+    heures.forEach(heure => {
+        tableHtml += `<tr><td class="text-center font-bold">${heure}</td>`;
+
+        jours.forEach(jour => {
+            let matiere = data.emploi_du_temps[jour][heure] || "";
+            tableHtml += `<td contenteditable="true" class="text-center border p-2">${matiere}</td>`;
+        });
+
+        tableHtml += `</tr>`;
+    });
+
+    tableHtml += `</tbody></table>`;
+
+    // Insérer le tableau dans le conteneur
+    container.innerHTML = tableHtml;
+}
+
+// fin code
+
+// code pour add un emploie de temp
+function attachSaveButtonEvent() {
+    document.getElementById("saveButton").addEventListener("click", function () {
+        console.log("✅ Bouton 'Enregistrer' cliqué !");
+        
+        let emploiData = [];
+        const tableRows = document.querySelectorAll("#emploiTable tbody tr");
+
+        tableRows.forEach(row => {
+            const heure = row.cells[0].textContent.trim(); // Heure dans la première colonne
+
+            ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"].forEach((jour, index) => {
+                let matiere = row.cells[index + 1].textContent.trim(); // Matière dans les cellules suivantes
+
+                if (matiere) {  // On enregistre seulement si une matière est renseignée
+                    emploiData.push({
+                        jour: jour,
+                        heure: heure,
+                        matiere: matiere,
+                        salle: document.getElementById("salle").value  // Récupère la salle sélectionnée
+                    });
+                }
+            });
+        });
+
+        let formData = { emploi_du_temps: emploiData };
+        console.log("📌 Données envoyées :", formData);
+        const addemploieUrl = "{% url 'add_emploi_temps' %}";
+        fetch(addemploieUrl, {  // URL de l'endpoint Django
+            method: "POST",
+            body: JSON.stringify(formData),
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("✅ " + data.message); // Affiche un message de succès
+            location.reload(); // Recharge la page après l'enregistrement
+            } else {
+                alert("❌ Erreur lors de l'enregistrement !");
+            }
+        })
+        .catch(error => {
+            console.error("❌ Erreur réseau :", error);
+            alert("Erreur de connexion avec le serveur !");
+        });
+    });
+}
+
+
+// fin code pour save un emploie de temp
 
 
 

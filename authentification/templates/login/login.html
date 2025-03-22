@@ -5,11 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>login</title>
-    <!---<link rel="stylesheet" href="{% static 'login/style.css' %}">-->
+    <link rel="stylesheet" href="{% static 'login/style.css' %}">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<style>
+ .login{
+            background-image: url("{% static 'login/images/bg1.jpg' %}");
+        }
+</style>
 <!--<body class="bg-cover bg-fixed flex items-center justify-center mt-40" style="background-image: url( 'images/bg1.jpg' );">--->
-    <body class="bg-cover bg-fixed flex items-center justify-center mt-40" style="background-image: url({% static 'images/bg1.jpg' %});">
+    <body class="bg-cover bg-fixed flex items-center justify-center mt-40 login" >
     <form class="w-full bg-transparent p-6 max-w-md rounded-3xl" action="{% url 'login_request' %}" method="POST" style="box-shadow: 0 10px 20px rgba(0, 0, 0, 0.9);">
 
         {% csrf_token %}

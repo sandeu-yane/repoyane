@@ -1,0 +1,123 @@
+@-webkit-keyframes upDown {
+    0% {
+      -webkit-transform: translateY(-45px);
+              transform: translateY(-45px);
+    }
+    50% {
+      -webkit-transform: translateY(45px);
+              transform: translateY(45px);
+    }
+    100% {
+      -webkit-transform: translateY(-45px);
+              transform: translateY(-45px);
+    }
+  }
+  @keyframes upDown {
+    0% {
+      -webkit-transform: translateY(-45px);
+              transform: translateY(-45px);
+    }
+    50% {
+      -webkit-transform: translateY(45px);
+              transform: translateY(45px);
+    }
+    100% {
+      -webkit-transform: translateY(-45px);
+              transform: translateY(-45px);
+    }
+  }
+ 
+
+  .AutoShow {
+    animation: autoshowAnimation 1s ease-in both; animation-timeline:view(70% 5%);
+}
+@keyframes autoshowAnimation {
+    from {
+        transform: translateY(200px) scale(0.5);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.fadeInMidle{
+  animation: fromBottom 1s ease-in both; animation-timeline:view(70% 5%);
+}
+.fadeInLeft{
+    animation: fromLeft 0.5s ease-in both;animation-timeline:view(70% 5%);
+  }
+  .fadeInRight{
+    animation: fromRight 1s ease-in both;animation-timeline:view(70% 15%);
+  }
+  
+
+
+/* Animation pour les éléments du premier col */
+@keyframes fromLeft {
+    from {
+        transform: translateX(-100px) scale(0.5);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+}
+
+/* Animation pour les éléments du deuxième col */
+@keyframes fromBottom {
+    from {
+        transform: translateY(100%) scale(0.5);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+/* Animation pour les éléments du troisième col */
+@keyframes fromRight {
+    from {
+        transform: translateX(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.autorotate {
+  animation: autorotateAnimation;
+  animation-timeline:view();
+}
+/* Animation de rotation */
+@keyframes autorotateAnimation {
+  from {
+      transform: rotate(0deg);
+  }
+  to {
+      transform: rotate(360deg);
+  }
+}
+.autoblur .el1{position: relative;
+  left: 200px;
+}
+.autoblur{
+  animation:autoblurAnimation linear both; animation-timeline:view()
+}
+@keyframes autoblurAnimation {
+  0% {
+      filter:blur(40px);
+  }
+  45%, 55% {
+      filter:blur(0px);
+  }
+  100% {
+      filter:blur(40px);
+  }
+}
+

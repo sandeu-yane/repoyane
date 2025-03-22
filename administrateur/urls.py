@@ -30,5 +30,11 @@ urlpatterns = [
     path('addeleve/', views.addeleve, name="addeleve"),
     path('get_enseignant/<int:id>/', views.get_enseignant, name='get_enseignant'),
     path('modifier_enseignant/<int:id>/', views.modifier_enseignant, name='modifier_enseignant'),
+    path('filtrer_salles_par_niveau/', views.filtrer_salles_par_niveau, name='filtrer_salles_par_niveau'),
+    path('save_emploi_temps/', views.save_emploi_temps, name='save_emploi_temps'),
+    path('emploi_temps_view/', views.emploi_temps_view, name='emploi_temps_view'),
+    path('add_emploi_temps/', views.add_emploi_temps, name='add_emploi_temps'),
+
+
 ]
 

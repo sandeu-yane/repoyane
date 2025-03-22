@@ -1,12 +1,17 @@
+import json
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from rest_framework.decorators import api_view
 
 from enseignant.models import Enseignant
-from administrateur.models import Salle
+from administrateur.models import EmploiDeTemp, Matiere, Niveau, Salle
 from administrateur.models import Eleve
 from parent.models import Parent
-
+from rest_framework.response import Response
+from django.http import JsonResponse
 # la vus du dashbord de l'administrateur
 @login_required
 def tab_administrateur(request):
@@ -18,6 +23,10 @@ def tab_administrateur(request):
      parent = Parent.objects.all()
      eleve =Eleve.objects.all()
      salle =Salle.objects.all()
+     niveaux = Niveau.objects.all()
+     matieres = Matiere.objects.all()
+     salle = Salle.objects.all()
+     emploi = EmploiDeTemp.objects.all()
        # Combinez les deux dictionnaires dans un seul
      context = {
         "liste_enseignant": enseignant,
@@ -25,6 +34,8 @@ def tab_administrateur(request):
         "liste_salle": salle,
         "liste_eleve": eleve,
         "salles":salle,
+        "niveaux":niveaux,
+        "emploi" :emploi,
     }
 
      return render(request, "tableau/indexadmin.html", context   )
@@ -133,11 +144,11 @@ def addmatiere(request):
         nom = request.POST.get('nom')
         coefficient = request.POST.get('coefficient')
             # Créer une nouvelle salle
-        new_matiere = Salle(nom=nom,coefficient=coefficient )
+        new_matiere = Matiere(nom=nom,coefficient=coefficient )
         new_matiere.save()
 
             # Récupérer la liste actualisée des salles après l'ajout
-        matieres = matieres.objects.all()
+        matieres = Matiere.objects.all()
         return render(request, "tableau/indexadmin.html", {'liste_matiere': matieres})
     
 # la fonction qui permet d'ajouter un eleve
@@ -220,8 +231,146 @@ def modifier_enseignant(request, id):
         enseignant.save()
         
         return redirect('tab_administrateur')  # Rediriger après la modification
+    
+    #FONCTION POUR L'EMPLOIE DE TEMPS
+@csrf_exempt
+def filtrer_salles_par_niveau(request):
+    if request.method == 'POST':
+        niveau_id = request.POST.get("niveau")
+        
+        try:
+            niveau = Niveau.objects.get(id=niveau_id)
+            salles = Salle.objects.filter(niveau=niveau).values('id', 'nom')
+            return JsonResponse({'salles': list(salles)})
+        
+        except Niveau.DoesNotExist:
+            return JsonResponse({'error': 'Niveau introuvable.'}, status=404)
 
+    return JsonResponse({'error': 'Requête non autorisée'}, status=400)
 
+# code pour enregistrer l'emploie de temp
+@csrf_exempt
+def save_emploi_temps(request):
+    if request.method == 'POST':
+        salle_id = request.POST.get('salle')
+        for key, value in request.POST.items():
+            if key.startswith('matiere_'):
+                # Extraire l'heure et le jour
+                _, heure, jour = key.split('_')
+                # Enregistrer chaque matière dans la base de données
+                EmploiDeTemp.objects.create(salle_id=salle_id, heure=heure, jour=jour, matiere=value)
 
+        return redirect('votre_vue_de_confirmation')
+    
+    
+    from django.shortcuts import render
+from .models import Salle, EmploiDeTemp
 
+"""def emploi_temps_view(request):
+    if request.method == 'POST':
+        niveau_id = request.POST.get('niveau')
+        salle_id = request.POST.get('salle')
+        
+        salle = get_object_or_404(Salle, id=salle_id)
 
+        # Récupérer l'emploi du temps pour cette salle
+        emploi_du_temps = EmploiDeTemp.objects.filter(salle=salle)
+
+        # Construire une structure JSON avec les matières
+        emploi_data = { jour: {heure: "" for heure in [
+            "7h30 - 8h30", "8h30 - 9h30", "9h30 - 10h30",
+            "10h30 - 11h30", "11h30 - 12h30", "12h30 - 13h30",
+            "13h30 - 14h30", "14h30 - 15h30", "15h30 - 16h30"
+        ]} for jour in ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"]}
+
+        # Remplir avec les matières existantes
+        for emploi in emploi_du_temps:
+            emploi_data[emploi.jour][emploi.heure] = emploi.matiere.nom
+
+        return JsonResponse({
+            'salle': salle.nom,
+            'emploi_du_temps': emploi_data
+        })
+
+    return render(request, 'tableau/indexadmin.html')"""
+
+def emploi_temps_view(request):
+    if request.method == 'POST':
+        niveau_id = request.POST.get('niveau')
+        salle_id = request.POST.get('salle')
+        salle = Salle.objects.get(id=salle_id)
+
+        # Récupérer l'emploi du temps pour la salle
+        emploi_du_temps = EmploiDeTemp.objects.filter(salle=salle)
+
+        # Construire les données sous forme de dictionnaire
+        emploi_dict = {}
+        jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"]
+        heures = [
+            "7h30 - 8h30", "8h30 - 9h30", "9h30 - 10h30",
+            "10h30 - 11h30", "11h30 - 12h30", "12h30 - 13h30",
+            "13h30 - 14h30", "14h30 - 15h30", "15h30 - 16h30"
+        ]
+
+        # Initialiser les cases vides
+        for jour in jours:
+            emploi_dict[jour] = {}
+            for heure in heures:
+                emploi_dict[jour][heure] = ""
+
+        # Remplir avec les données existantes
+        for emploi in emploi_du_temps:
+            heure_range = emploi.heure_debut.strftime("%H:%M") + " - " + emploi.heure_fin.strftime("%H:%M")
+            emploi_dict[emploi.jour][heure_range] = emploi.matiere  # ✅ Correction ici
+
+        return JsonResponse({"emploi_du_temps": emploi_dict})
+
+    return render(request, 'tableau/indexadmin.html')
+
+# code pour save un emploie de temp 
+from .serializers import EmploiDeTempSerializer
+from datetime import datetime
+import json
+from datetime import datetime
+from django.http import JsonResponse
+from rest_framework.decorators import api_view
+
+@api_view(["POST"])
+def add_emploi_temps(request):
+    try:
+        data = request.data  # ✅ DRF gère le parsing du JSON
+        print("🔹 Requête reçue :", data)
+
+        if "emploi_du_temps" not in data:
+            return Response({"error": "Données invalides"}, status=400)
+
+        emploi_objects = []
+        for emploi in data["emploi_du_temps"]:
+            salle_obj = get_object_or_404(Salle, id=int(emploi["salle"]))
+
+            # ✅ Séparer l'heure en heure_debut et heure_fin
+            heure_parts = emploi["heure"].split(" - ")
+            if len(heure_parts) != 2:
+                return Response({"error": "Format d'heure invalide"}, status=400)
+
+            heure_debut = datetime.strptime(heure_parts[0], "%Hh%M").time()
+            heure_fin = datetime.strptime(heure_parts[1], "%Hh%M").time()
+
+            emploi_objects.append(
+                EmploiDeTemp(
+                    jour=emploi["jour"],
+                    heure_debut=heure_debut,  # ⚠️ Correction du champ
+                    heure_fin=heure_fin,      # ⚠️ Correction du champ
+                    matiere=emploi["matiere"],
+                    salle=salle_obj
+                )
+            )
+
+        # 🌟 Insertion rapide en base de données
+        EmploiDeTemp.objects.bulk_create(emploi_objects)
+
+        return Response({"message": "Emploi du temps enregistré avec succès"}, status=201)
+
+    except Exception as e:
+        print("❌ ERREUR :", str(e))
+        return Response({"error": "Erreur interne du serveur"}, status=500)

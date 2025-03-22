@@ -11,7 +11,7 @@
 }
 
 body {
-    background: var(--lightly);
+    background: #000;
 }
 
 .material-icons-outlined {
@@ -112,5 +112,32 @@ body {
 
     .sidebar-brand > .label-title {
         display: none;
-    }
+  
+  
+  }
+
+}
+
+.tab-emp{
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    justify-items: center;
+    align-items: center;
+    position: absolute;
+
+}
+
+#form-container-emploie{
+    display:flex;
+    text-align: center;
+    position: static;
+    justify-content: center;
+    align-items: center;
+    width:200%;
+
+}
+
+#form-container-emploie form{
+    text-align: center;
 }

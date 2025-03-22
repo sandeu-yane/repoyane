@@ -26,6 +26,10 @@ urlpatterns = [
   path('enregistrer_assiduite/', views.enregistrer_assiduite, name='enregistrer_assiduite'),
   #path('get-matieres/<int:niveau_id>/', views.get_matieres_par_niveau, name='get_matieres_par_niveau'), # url de la fonction de trier des matiere par nivveau
   path('get-eleves/', views.get_eleves, name='get_eleves'),
-  path('gestion_notes/', views.gestion_notes, name='gestion_notes'),
+  path('enregistrer_notes/', views.enregistrer_notes, name='enregistrer_notes'),
   path('add_assiduite/', views.add_assiduite, name='add_assiduite'),
+  #path('filtrer_salles_et_matieres/', views.filtrer_salles_et_matieres, name='filtrer_salles_et_matieres'),
+  path('recuperer_eleves_par_salle/', views.recuperer_eleves_par_salle, name='recuperer_eleves_par_salle'),
+  path('filtrage_notes/', views.filtrage_notes, name='filtrage_notes'),
+ 
 ]

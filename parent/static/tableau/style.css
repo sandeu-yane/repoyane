@@ -1,3 +1,43 @@
+#zap {
+    padding-left: 50px;top: 10px !important;
+    width: 100px;
+    animation: upDown ease-in-out infinite !important;
+}
+
+.ANIME {
+    animation: bouge ease-in-out infinite !important;
+}
+
+@keyframes bouge {
+    0% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(10px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@keyframes upDown {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+
+
+
+
+
+
+
+
+
 /* Code CSS modifié */
 :root {
     --cyan: hsl(206, 100%, 88%);
@@ -46,7 +86,7 @@ body {
 /* ======sidebar======== */
 #sidebar {
     grid-area: sidebar;
-    background-color: var(--light-red); /* Couleur rouge légère */
+    background-color: var(--cyan); /* Couleur rouge légère */
     color: var(--text-cyan);
     height: 100%;
     overflow-y: auto;
@@ -114,3 +154,4 @@ body {
         display: none;
     }
 }
+

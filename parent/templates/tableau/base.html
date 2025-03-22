@@ -7,123 +7,565 @@
     <title>Dashboard</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.0.0/dist/tailwind.min.css" rel="stylesheet">
+
+
     <link rel="stylesheet" href="{% static 'tableau/style.css' %}">
+    <link rel="stylesheet" href="{% static 'tableau/new css.css' %}">
 </head>
+<style>
+    .hidden {
+        display: none;
+    }
+   
+    .imge{
+        position:relative; left:70px;
+        border-radius:50%;justify-content: center;align-items: center;
+    }
+    body{
+        background-color: rgb(235, 235, 243);
+         background-image: url("{% static 'images/logoapp.png' %}"); 
+        background-size:750px 700px;
+        background-position:center;
+        background-repeat: no-repeat;
+        justify-content: end;
+    }
+    .main-title{
+        position:relative;
+        left:10%;
+    }
+    #emploi-form{position:relative;
+        left:10%
+    }
+</style>
 <body>
+<!-- Formulaire de sélection de la date -->
+<!-- 📌 Modal pour sélectionner la date -->
+<div id="dateModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white p-5 rounded shadow-lg">
+        <h2 class="text-lg font-semibold mb-3">Sélectionnez une date</h2>
+        <input type="date" id="dateInput" class="border p-2 w-full rounded">
+        <div class="mt-4 flex justify-end space-x-2">
+            <button id="confirmDateButton" class="bg-blue-500 text-white px-4 py-2 rounded">Valider</button>
+            <button onclick="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded">Annuler</button>
+        </div>
+    </div>
+</div>
+
+<!-- 📌 Conteneur pour afficher les résultats -->
+<div id="table-container" class="mt-4"></div>
+ 
+<!-- code pour le formulaire sequence de notes -->
+<!-- 📌 Modal pour sélectionner une séquence -->
+<div id="sequenceModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white p-5 rounded shadow-lg">
+        <h2 class="text-lg font-semibold mb-3">Sélectionnez une séquence</h2>
+        <select id="sequenceInput" class="border p-2 w-full rounded">
+            <option value="">-- Choisir une séquence --</option>
+            <option value="1">Séquence 1</option>
+            <option value="2">Séquence 2</option>
+            <option value="3">Séquence 3</option>
+            <option value="4">Séquence 4</option>
+            <option value="5">Séquence 5</option>
+            <option value="6">Séquence 6</option>
+        </select>
+        <div class="mt-4 flex justify-end space-x-2">
+            <button id="confirmSequenceButton" class="bg-blue-500 text-white px-4 py-2 rounded">Valider</button>
+            <button onclick="closeSequenceModal()" class="bg-gray-500 text-white px-4 py-2 rounded">Annuler</button>
+        </div>
+    </div>
+</div>
+
+<!-- 📌 Conteneur pour afficher les résultats -->
+<div id="notes-container" class="mt-4"></div>
+
+
+<!-- 📌 code pour le formulaire emploie -->
+
+<!-- 📌 Modal pour sélectionner une salle -->
+<div id="emploiModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white p-5 rounded shadow-lg">
+        <h2 class="text-lg font-semibold mb-3">Sélectionnez une Salle</h2>
+        <select id="salleInput" class="border p-2 w-full rounded">
+            <option value="">-- Choisir une salle --</option>
+            {% for salle in salles %}
+            <option value="{{ salle.id }}">{{ salle.nom }}</option>
+            {% endfor %}
+        </select>
+       
+        <div class="mt-4 flex justify-end space-x-2">
+            <button id="confirmEmploiButton" class="bg-blue-500 text-white px-4 py-2 rounded">Valider</button>
+            <button onclick="closeEmploiModal()" class="bg-gray-500 text-white px-4 py-2 rounded">Annuler</button>
+        </div>
+    </div>
+</div>
+
+<!-- 📌 Conteneur pour afficher l'emploi du temps -->
+<div id="emploi-container" class="mt-4"></div>
+
+
 
     <div class="grid-container">
         <header class="header">
             <div class="menu-icon">
-                <span class="material-icons-outlined" id="menu-icon">
-                    menu
-                </span>
+                <span class="material-icons-outlined" id="menu-icon">menu</span>
             </div>
             <div class="header-left">
-                <span class="material-icons-outlined" id="search-icon">
-                    search
-                </span>
+                <span class="material-icons-outlined" id="search-icon">search</span>
             </div>
-            <div class="header-right ">
-                <span class="material-icons-outlined" id="notifications-icon">
-                    notifications
-                </span>
-                <span class="material-icons-outlined" id="email-icon">
-                    email
-                </span>
-                <span class="material-icons-outlined" id="account-icon">
-                    account_circle
-                </span>
+            <div class="header-right">
+                <span class="material-icons-outlined" id="notifications-icon">notifications</span>
+                <span class="material-icons-outlined" id="email-icon">email</span>
+                <span class="material-icons-outlined" id="account-icon">account_circle</span>
             </div>
         </header>
 
         <aside id="sidebar">
             <div class="sidebar-brand">
                 <div class="sidebar-title">
-                    <span title="CTM" class="material-icons-outlined">
-                        terminal
-                    </span>
+                    <span title="CTM" class="material-icons-outlined">MENU</span>
                     <span class="label-title">CTM</span>
                 </div>
             </div>
+            <style>
+                #sidebar{
+                    background:rgb(46, 42, 42);
+                }
+            </style>
             
+            <div class="imge">
+                <img src="/static/images/logoapp.png" width ="100px">
+            </div>
+
+
             <ul class="sidebar-list">
-                <li class="sidebar-list-item" data-content="notes">
-                    <span title="notes" class="material-icons-outlined">
-                        grade
-                    </span>
-                    <span class="label-item">Consulter les notes</span>
+                <li class="sidebar-list-item" data-content="enfants">
+                    <span title="notes" class="material-icons-outlined">grade</span>
+                    <span class="label-item">MES ENFANTS</span>
                 </li>
                 <li class="sidebar-list-item" data-content="assiduité">
-                    <span title="assiduité" class="material-icons-outlined">
-                        task
-                    </span>
+                    <span title="assiduité" class="material-icons-outlined">task</span>
                     <span class="label-item">Consulter l'assiduité</span>
                 </li>
                 <li class="sidebar-list-item" data-content="statistique">
-                    <span title="CTM" class="material-icons-outlined">
-                        bar_chart
-                    </span>
+                    <span title="CTM" class="material-icons-outlined">bar_chart</span>
                     <span class="label-item">Consulter les statistiques</span>
                 </li>
                 <li class="sidebar-list-item" data-content="deconnexion">
-                    <span title="deconnexion" class="material-icons-outlined">
-                        exit_to_app
-                    </span>
-                    <span class="label-item">Deconnexion</span>
+                    <span title="deconnexion" class="material-icons-outlined">exit_to_app</span>
+                    <span class="label-item">Déconnexion</span>
                 </li>
             </ul>
+
+            <button clas="  ANIME" id="zap">
+                <a href="#"  class=" ANIME"><img src="/static/images/logozap.png"  alt="whatsapp"></a>
+            </button>
+
+
+            
+            <style>
+                #zap {
+    padding-left: 50px;top: 10px !important;
+    width: 100px;border-radius: 50%;
+    animation: upDown ease-in-out infinite !important;
+}
+
+.ANIME {
+    animation: bouge ease-in-out infinite !important;
+}
+
+@keyframes bouge {
+    0% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(10px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+            </style>
+
+            
         </aside>
 
         <main class="main-container" id="main-content">
             <div class="main-title">
                 <p class="fw-600">Dashboard</p>
             </div>
+
+            <!-- Section pour afficher les enfants -->
+            <div class="main-title">
+                <p class="fw-600">Mes Enfants</p>
+            </div>
+            <div id="students-container">
+                {% if enfants %}
+                <ul>
+                    {% for enfant in enfants %}
+                        <li class="student-card border rounded p-4 my-2">
+                            <h3>Noms: {{ enfant.noms }} {{ enfant.prenoms }}</h3>
+                            <p>Sexe: {{ enfant.sexe }}</p>
+                            <p>Salle: {{ enfant.salle }}</p>
+        
+                            <button onclick="consultNotes('{{ enfant.id }}')" class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded">Consulter Notes</button>
+                            <button onclick="openModal('{{ enfant.id }}')" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded">  Consulter Assiduité</button>
+                            <button onclick="consultEmploie('{{ enfant.id }}')" class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-1 px-2 rounded">Consulter Emploie</button>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Aucun enfant trouvé.</p>
+            {% endif %}
+            </div>
         </main>
     </div>
 
     <script>
-        const sidebarItems = document.querySelectorAll('.sidebar-list-item');
-        const mainContent = document.getElementById('main-content');
+        // Fonctionnalités de consultation
+        function consultNotes(studentId) {
+            alert(`Consulter les notes pour l'élève ID: ${studentId}`);
+        }
+// *****fonctionnalité consulté assiduité *****
+//let selectedStudentId = null;  // Variable pour stocker l'élève sélectionné
 
-        sidebarItems.forEach(item => {
+// 🔹 Fonction pour ouvrir la modal avec l'ID de l'élève
+function openModal(studentId) {
+    selectedStudentId = studentId;
+    document.getElementById("dateModal").classList.remove("hidden"); // Affiche la modal
+}
+
+// 🔹 Fonction pour fermer la modal
+function closeModal() {
+    document.getElementById("dateModal").classList.add("hidden");
+}
+
+// 🔹 Fonction pour valider la date et récupérer les assiduités
+document.getElementById("confirmDateButton").addEventListener("click", function () {
+    let dateInput = document.getElementById("dateInput").value;
+    if (!dateInput) {
+        alert("⚠️ Veuillez entrer une date !");
+        return;
+    }
+
+    console.log(`🔹 Récupération des assiduités pour l'élève ${selectedStudentId} à la date ${dateInput}`);
+    const consulterAssiduiteUrl = "{% url 'consulter_assiduite' %}";
+
+    fetch(consulterAssiduiteUrl, {
+        method: "POST",
+        body: new URLSearchParams({
+            eleve_id: selectedStudentId,
+            date: dateInput
+        }),
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // ✅ Générer le tableau des assiduités
+            let tableHtml = `
+                <table class="border-collapse border border-gray-300 mt-4">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="border border-gray-300 px-4 py-2">Matière</th>
+                            <th class="border border-gray-300 px-4 py-2">Présence</th>
+                            <th class="border border-gray-300 px-4 py-2">Observation</th>
+                            <th class="border border-gray-300 px-4 py-2">Date</th>
+                            <th class="border border-gray-300 px-4 py-2">Heure</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.assiduites.map(assiduite => `
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">${assiduite.matiere__nom}</td>
+                                <td class="border border-gray-300 px-4 py-2 text-center">${assiduite.present ? "✅ Présent" : "❌ Absent"}</td>
+                                <td class="border border-gray-300 px-4 py-2">${assiduite.observation || "Aucune"}</td>
+                                <td class="border border-gray-300 px-4 py-2">${assiduite.date}</td>
+                                <td class="border border-gray-300 px-4 py-2">${assiduite.heure}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById("table-container").innerHTML = tableHtml;
+        } else {
+            alert("❌ Aucune assiduité trouvée !");
+        }
+
+        closeModal();  // Ferme la modal après validation
+    })
+    .catch(error => {
+        console.error("❌ Erreur :", error);
+        alert("Une erreur est survenue lors de la récupération des données.");
+    });
+});
+
+
+// ****fin code assiduité****
+
+
+        function consultEmploie(studentId) {
+            alert(`Consulter les statistiques pour l'élève ID: ${studentId}`);
+        }
+
+        //code pour consulter les notes 
+        let selectedStudentId = null;  // Variable pour stocker l'élève sélectionné
+
+// 🔹 Fonction pour ouvrir la modal avec l'ID de l'élève
+function consultNotes(studentId) {
+    selectedStudentId = studentId;
+    document.getElementById("sequenceModal").classList.remove("hidden");
+}
+
+// 🔹 Fonction pour fermer la modal
+function closeSequenceModal() {
+    document.getElementById("sequenceModal").classList.add("hidden");
+}
+
+// 🔹 Fonction pour valider la séquence et récupérer les notes
+document.getElementById("confirmSequenceButton").addEventListener("click", function () {
+    let sequence = document.getElementById("sequenceInput").value;
+    
+    if (!sequence) {
+        alert("⚠️ Veuillez sélectionner une séquence !");
+        return;
+    }
+
+    console.log(`🔹 Récupération des notes pour l'élève ${selectedStudentId} à la séquence ${sequence}`);
+    const consulterNotesUrl = "{% url 'consulter_notes' %}";  // URL Django pour récupérer les notes
+
+    fetch(consulterNotesUrl, {
+        method: "POST",
+        body: new URLSearchParams({
+            eleve_id: selectedStudentId,
+            sequence: sequence
+        }),
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // ✅ Générer le tableau des notes
+            let tableHtml = `
+                <table class="border-collapse border border-gray-300 mt-4">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="border border-gray-300 px-4 py-2">Matière</th>
+                            <th class="border border-gray-300 px-4 py-2">Note</th>
+                            <th class="border border-gray-300 px-4 py-2">Appréciation</th>
+                            <th class="border border-gray-300 px-4 py-2">Séquence</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.notes.map(note => `
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">${note.matiere__nom}</td>
+                                <td class="border border-gray-300 px-4 py-2 text-center">${note.note}</td>
+                                <td class="border border-gray-300 px-4 py-2">${note.appreciation || "Aucune"}</td>
+                                <td class="border border-gray-300 px-4 py-2 text-center">${note.sequence}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById("notes-container").innerHTML = tableHtml;
+        } else {
+            alert("❌ Aucune note trouvée !");
+        }
+
+        closeSequenceModal();  // Ferme la modal après validation
+    })
+    .catch(error => {
+        console.error("❌ Erreur :", error);
+        alert("Une erreur est survenue lors de la récupération des données.");
+    });
+});
+
+        // fin code note
+
+        // Gestion de la déconnexion
+        document.querySelectorAll('.sidebar-list-item').forEach(item => {
             item.addEventListener('click', () => {
                 const content = item.getAttribute('data-content');
-                let contentHtml = '';
 
-                if (content === 'notes') {
-                    contentHtml = `
-                        <div class="main-title">
-                            <p class="fw-600">Notes</p>
-                        </div>
-                        <p>Affichage des notes.</p>`;
-                } else if (content === 'assiduité') {
-                    contentHtml = `
-                        <div class="main-title">
-                            <p class="fw-600">Assiduité</p>
-                        </div>
-                        <p>Affichage de l'assiduité.</p>`;
-                } else if (content === 'statistique') {
-                    contentHtml = `
-                        <div class="main-title">
-                            <p class="fw-600">Statistiques</p>
-                        </div>
-                        <p>Affichage des statistiques.</p>`;
-                } else if (content === 'deconnexion') {
-                    contentHtml = `
-                        <div class="main-title">
-                            <p class="fw-600">Deconnexion</p>
-                        </div>
-                        <form method="post" action="{% url 'deconnexion' %}" id="logout-form">
-                            {% csrf_token %}
-                            <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                Déconnexion
-                            </button>
-                        </form>`;
+                if (content === 'deconnexion') {
+                    const confirmation = confirm("Êtes-vous sûr de vouloir vous déconnecter ?");
+                    if (confirmation) {
+                        document.getElementById('logout-form').submit();
+                    }
+                } else {
+                    // Logique pour d'autres items, si nécessaire
                 }
-
-                mainContent.innerHTML = contentHtml;
             });
         });
+
+        // code pour la consultaio emploie 
+        // Fonction pour ouvrir le modal
+function consultEmploie(studentId) {
+    document.getElementById("emploiModal").classList.remove("hidden"); // Afficher la modal
+}
+
+// Fonction pour fermer le modal
+function closeEmploiModal() {
+    document.getElementById("emploiModal").classList.add("hidden"); // Cacher la modal
+}
+
+// Gestion de la soumission du formulaire pour consulter l'emploi du temps
+document.getElementById("confirmEmploiButton").addEventListener("click", function () {
+    let salleId = document.getElementById("salleInput").value;
+    if (!salleId) {
+        alert("⚠️ Veuillez sélectionner une salle !");
+        return;
+    }
+
+    console.log(`🔹 Récupération de l'emploi du temps pour la salle ${salleId}`);
+    const consulterEmploiUrl = "{% url 'consulter_emploi_temps' %}";  // Ajoute cette URL dans tes `urls.py`
+
+    fetch(consulterEmploiUrl, {
+        method: "POST",
+        body: new URLSearchParams({ salle_id: salleId }),
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // ✅ Générer le tableau de l'emploi du temps
+            let tableHtml = `
+                <table class="border-collapse border border-gray-300 mt-4">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="border border-gray-300 px-4 py-2">Heure</th>
+                            <th class="border border-gray-300 px-4 py-2">Lundi</th>
+                            <th class="border border-gray-300 px-4 py-2">Mardi</th>
+                            <th class="border border-gray-300 px-4 py-2">Mercredi</th>
+                            <th class="border border-gray-300 px-4 py-2">Jeudi</th>
+                            <th class="border border-gray-300 px-4 py-2">Vendredi</th>
+                            <th class="border border-gray-300 px-4 py-2">Samedi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.emploi_du_temps.map(emploi => `
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">${emploi.heure_debut} - ${emploi.heure_fin}</td>
+                                <td class="border border-gray-300 px-4 py-2">${emploi.Lundi || ""}</td>
+                                <td class="border border-gray-300 px-4 py-2">${emploi.Mardi || ""}</td>
+                                <td class="border border-gray-300 px-4 py-2">${emploi.Mercredi || ""}</td>
+                                <td class="border border-gray-300 px-4 py-2">${emploi.Jeudi || ""}</td>
+                                <td class="border border-gray-300 px-4 py-2">${emploi.Vendredi || ""}</td>
+                                <td class="border border-gray-300 px-4 py-2">${emploi.Samedi || ""}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            // Afficher le tableau et masquer le formulaire
+            document.getElementById("emploi-container").innerHTML = tableHtml;
+            closeEmploiModal();
+        } else {
+            alert("❌ Aucun emploi du temps trouvé !");
+        }
+    })
+    .catch(error => {
+        console.error("❌ Erreur :", error);
+        alert("Une erreur est survenue lors de la récupération des données.");
+    });
+});
+// Fonction pour ouvrir le modal
+function consultEmploie(studentId) {
+    document.getElementById("emploiModal").classList.remove("hidden"); // Afficher la modal
+}
+
+// Fonction pour fermer le modal
+function closeEmploiModal() {
+    document.getElementById("emploiModal").classList.add("hidden"); // Cacher la modal
+}
+
+// Gestion de la soumission du formulaire pour consulter l'emploi du temps
+document.getElementById("confirmEmploiButton").addEventListener("click", function () {
+    let salleId = document.getElementById("salleInput").value;
+    if (!salleId) {
+        alert("⚠️ Veuillez sélectionner une salle !");
+        return;
+    }
+
+    console.log(`🔹 Récupération de l'emploi du temps pour la salle ${salleId}`);
+    const consulterEmploiUrl = "{% url 'consulter_emploi_temps' %}";  // Ajoute cette URL dans tes `urls.py`
+
+    fetch(consulterEmploiUrl, {
+        method: "POST",
+        body: new URLSearchParams({ salle_id: salleId }),
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // ✅ Générer le tableau de l'emploi du temps
+            let tableHtml = `
+                <table class="border-collapse border border-gray-300 mt-4">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="border border-gray-300 px-4 py-2">Heure</th>
+                            <th class="border border-gray-300 px-4 py-2">Lundi</th>
+                            <th class="border border-gray-300 px-4 py-2">Mardi</th>
+                            <th class="border border-gray-300 px-4 py-2">Mercredi</th>
+                            <th class="border border-gray-300 px-4 py-2">Jeudi</th>
+                            <th class="border border-gray-300 px-4 py-2">Vendredi</th>
+                            <th class="border border-gray-300 px-4 py-2">Samedi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.emploi_du_temps.map(emploi => `
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">${emploi.heure_debut} - ${emploi.heure_fin}</td>
+                                <td class="border border-gray-300 px-4 py-2">${emploi.Lundi || ""}</td>
+                                <td class="border border-gray-300 px-4 py-2">${emploi.Mardi || ""}</td>
+                                <td class="border border-gray-300 px-4 py-2">${emploi.Mercredi || ""}</td>
+                                <td class="border border-gray-300 px-4 py-2">${emploi.Jeudi || ""}</td>
+                                <td class="border border-gray-300 px-4 py-2">${emploi.Vendredi || ""}</td>
+                                <td class="border border-gray-300 px-4 py-2">${emploi.Samedi || ""}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            // Afficher le tableau et masquer le formulaire
+            document.getElementById("emploi-container").innerHTML = tableHtml;
+            closeEmploiModal();
+        } else {
+            alert("❌ Aucun emploi du temps trouvé !");
+        }
+    })
+    .catch(error => {
+        console.error("❌ Erreur :", error);
+        alert("Une erreur est survenue lors de la récupération des données.");
+    });
+});
+
+
+
+        
     </script>
+
+    <form method="post" action="{% url 'deconnexion' %}" id="logout-form" style="display: none;">
+        {% csrf_token %}
+    </form>
 </body>
 </html>

@@ -1,5 +1,7 @@
 from django.db import models
 
+from parent.models import Parent
+
 # Classe Salle
 class Salle(models.Model):
     nom = models.CharField(max_length=100)
@@ -14,6 +16,7 @@ class Salle(models.Model):
 
 # Classe Eleve
 class Eleve(models.Model):
+    #parent = models.ForeignKey(Parent, on_delete=models.CASCADE, related_name='enfants') 
     noms = models.CharField(max_length=100)
     prenoms = models.CharField(max_length=100)
     sexe = models.CharField(max_length=10)
@@ -44,3 +47,14 @@ class Niveau(models.Model):
 
     def __str__(self):
       return self.nom
+
+#classe emploie 
+class EmploiDeTemp(models.Model):
+    salle = models.ForeignKey(Salle, on_delete=models.CASCADE)
+    jour = models.CharField(max_length=20)  # Exemple: Lundi, Mardi, etc.
+    heure_debut = models.TimeField()
+    heure_fin = models.TimeField()
+    matiere = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.salle} - {self.jour} {self.heure_debut} - {self.heure_fin}"
